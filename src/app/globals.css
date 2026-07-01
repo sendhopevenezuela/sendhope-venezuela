@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* ── Tipografía ─────────────────────────────────────────────────────────── */
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), "Courier New", monospace;
+
+  /* ── Paleta "Bandera" ────────────────────────────────────────────────────
+     Azul, amarillo y rojo de la bandera venezolana, ajustados para pantalla.
+     El azul ancla confianza. El oro dispara acción. El escarlata — con mucha
+     sobriedad — señala urgencia sin generar ansiedad. */
+
+  --color-navy:       #003082;   /* azul bandera */
+  --color-navy-dark:  #001D4E;   /* azul oscuro, fondo hero / footer */
+  --color-navy-mid:   #0042A6;   /* mid-tone para gradientes */
+  --color-navy-light: #EEF4FF;   /* fondo de secciones tintadas */
+
+  --color-gold:       #F4C31D;   /* amarillo bandera */
+  --color-gold-dark:  #C8A015;   /* hover de botones dorados */
+  --color-gold-light: #FFFBEB;   /* fondo cards / badges dorados */
+
+  --color-scarlet:    #CE1126;   /* rojo bandera — usar con parsimonia */
+  --color-scarlet-light: #FFF0F2;
+
+  /* Fondos y texto */
+  --color-cream: #FEFBF6;        /* blanco cálido, evita la frialdad del #fff */
+  --color-ink:   #0A1628;        /* navy-tinted near-black */
+  --color-muted: #64748B;
+
+  /* Verificado — esmeralda, distinto del oro para no confundir */
+  --color-verified:       #059669;
+  --color-verified-dark:  #047857;
+  --color-verified-light: #D1FAE5;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Base ────────────────────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

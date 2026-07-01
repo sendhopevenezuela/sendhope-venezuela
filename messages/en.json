@@ -1,0 +1,112 @@
+{
+  "header": {
+    "donar": "Donate now"
+  },
+  "hero": {
+    "headline": "Every dollar reaches the shelter — with a photo and a receipt.",
+    "subheadline": "We channel direct donations to families displaced by the June 2026 floods in Barquisimeto, Venezuela. No middlemen. Every purchase documented.",
+    "cta": "Donate now",
+    "stat_label": "raised so far",
+    "stat_empty": "Be the first to donate",
+    "stat_donors": "{count} donors"
+  },
+  "how": {
+    "title": "How it works",
+    "step1_title": "You donate",
+    "step1_body": "A direct, secure transfer from wherever you are. You get immediate confirmation.",
+    "step2_title": "We buy in Barquisimeto",
+    "step2_body": "Our ground team purchases food, water, and essential supplies — receipt in hand, no unaccounted cash.",
+    "step3_title": "We deliver with proof",
+    "step3_body": "Every shelter delivery is photographed before the cycle closes. No photo, no publication.",
+    "step4_title": "It stays public forever",
+    "step4_body": "The purchase, scanned receipt, and delivery photo are published on the Transparency Wall. Anyone can see them."
+  },
+  "transparency": {
+    "title": "Transparency Wall",
+    "subtitle": "Real purchases, real receipts, real shelters.",
+    "cta": "See all",
+    "purchase_label": "Verified purchase",
+    "delivery_label": "Delivered to"
+  },
+  "trust": {
+    "title": "Why trust SendHope?",
+    "body": "Every SendHope transaction ends with three things: a photo of the purchase, a scanned receipt, and a photo of the delivery at the shelter. We don't publish until we have all three. The green seal you see on each entry isn't decorative — it means that cycle was fully completed.",
+    "seal_label": "Verified Receipt",
+    "seal_sublabel": "Purchase documented and delivered",
+    "pillar_receipt": "Receipt",
+    "pillar_photo_buy": "Purchase photo",
+    "pillar_photo_delivery": "Delivery photo"
+  },
+  "closing": {
+    "headline": "Every dollar counts. Every purchase is verified.",
+    "cta": "Donate now"
+  },
+  "footer": {
+    "rights": "SendHope Venezuela. Built with love from Barquisimeto.",
+    "transparency": "Transparency Wall",
+    "contact": "Contact"
+  },
+  "pay_info": {
+    "title": "Donate right now",
+    "subtitle": "Transfer any amount you'd like and confirm it on our website so we can verify it.",
+    "cta": "Confirm my payment →",
+    "cta_hint": "Log your reference in 30 seconds",
+    "zelle_title": "Zelle",
+    "pago_movil_title": "Pago Móvil",
+    "transfer_title": "Bank transfer",
+    "not_configured": "Coming soon"
+  },
+  "team": {
+    "title": "Our team",
+    "subtitle": "The people behind every purchase, every receipt, and every delivery in Barquisimeto."
+  },
+  "donar": {
+    "page_title": "Make a donation — SendHope Venezuela",
+    "page_description": "Choose an amount, make the transfer, and confirm your reference. Your donation is logged and verified by our team.",
+    "back": "← Back",
+    "mini_hero_title": "Make a donation",
+    "mini_hero_subtitle": "Our team confirms your transfer within 24 hours. Every dollar is documented.",
+    "step1_label": "01",
+    "step1_title": "How much would you like to donate?",
+    "amount_custom_placeholder": "Other amount in USD",
+    "step2_label": "02",
+    "step2_title": "Make the payment",
+    "step2_subtitle": "Choose your preferred method and send the amount you selected.",
+    "tab_zelle": "Zelle",
+    "tab_pago_movil": "Pago Móvil",
+    "tab_transfer": "Bank transfer",
+    "zelle_label": "Zelle email / phone",
+    "zelle_name_label": "Name on account",
+    "pago_movil_phone_label": "Phone",
+    "pago_movil_bank_label": "Bank",
+    "pago_movil_cedula_label": "RIF / ID",
+    "transfer_bank_label": "Bank",
+    "transfer_account_label": "Account",
+    "step3_label": "03",
+    "step3_title": "Confirm your transfer",
+    "step3_subtitle": "This lets us verify your payment. Your name and email are never shown publicly.",
+    "reference_label": "Payment reference *",
+    "reference_placeholder": "e.g. last 4 digits, confirmation code...",
+    "reference_hint": "The code or reference your bank / Zelle gave you when completing the transfer.",
+    "name_label": "Your name",
+    "name_placeholder": "Optional — or stay anonymous",
+    "email_label": "Contact email",
+    "email_placeholder": "Optional — we'll notify you when confirmed",
+    "privacy_toggle_label": "How would you like your donation to appear?",
+    "public_option": "With my name",
+    "public_option_hint": "Your name will appear on the Transparency Wall",
+    "anonymous_option": "Anonymously",
+    "anonymous_option_hint": "Your donation is recorded without a visible name",
+    "privacy_note": "Your email will never be shown publicly.",
+    "submit": "Confirm donation of {amount}",
+    "submitting": "Submitting...",
+    "error_amount": "Please choose or enter a valid amount.",
+    "error_reference": "A payment reference is required for verification.",
+    "error_generic": "Something went wrong. Try again or contact us directly.",
+    "success_title": "Thank you for donating!",
+    "success_body": "We received your transfer confirmation. Our team will verify it within a few hours and publish it on the Transparency Wall.",
+    "success_cta": "See the Transparency Wall",
+    "success_back": "Back to home",
+    "success_another": "Make another donation"
+  }
+}

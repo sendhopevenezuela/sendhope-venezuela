@@ -1,0 +1,112 @@
+{
+  "header": {
+    "donar": "Donar ahora"
+  },
+  "hero": {
+    "headline": "Cada bolívar llega al refugio con foto y recibo.",
+    "subheadline": "Canalizamos donaciones directas hacia las familias afectadas por las inundaciones de junio de 2026 en Barquisimeto. Sin intermediarios. Cada compra documentada.",
+    "cta": "Donar ahora",
+    "stat_label": "recaudado hasta hoy",
+    "stat_empty": "Sé el primero en donar",
+    "stat_donors": "{count} donantes"
+  },
+  "how": {
+    "title": "Cómo funciona",
+    "step1_title": "Haces tu donación",
+    "step1_body": "Transferencia directa y segura desde donde estés. Recibes confirmación inmediata.",
+    "step2_title": "Compramos en Barquisimeto",
+    "step2_body": "El equipo en campo compra alimentos, agua y artículos de primera necesidad — recibo en mano, nada en efectivo suelto.",
+    "step3_title": "Documentamos la entrega",
+    "step3_body": "Cada entrega al refugio queda fotografiada antes de cerrar el ciclo. Sin foto, no se publica.",
+    "step4_title": "Queda público para siempre",
+    "step4_body": "La compra, el recibo escaneado y la foto de entrega se publican en el Muro de Transparencia. Cualquiera puede verlos."
+  },
+  "transparency": {
+    "title": "Muro de Transparencia",
+    "subtitle": "Compras reales, recibos reales, refugios reales.",
+    "cta": "Ver todo",
+    "purchase_label": "Compra verificada",
+    "delivery_label": "Entregado a"
+  },
+  "trust": {
+    "title": "¿Por qué confiar en SendHope?",
+    "body": "Cada transacción en SendHope termina con tres cosas: una foto de la compra, un recibo escaneado y una foto de la entrega en el refugio. No publicamos hasta tener los tres. El sello verde que ves en cada registro no es decorativo — es la promesa de que ese ciclo se cerró por completo.",
+    "seal_label": "Recibo Verificado",
+    "seal_sublabel": "Compra documentada y entregada",
+    "pillar_receipt": "Recibo",
+    "pillar_photo_buy": "Foto compra",
+    "pillar_photo_delivery": "Foto entrega"
+  },
+  "closing": {
+    "headline": "Cada bolívar cuenta. Cada compra se verifica.",
+    "cta": "Donar ahora"
+  },
+  "footer": {
+    "rights": "© 2026 SendHope Venezuela. Hecho desde Barquisimeto con urgencia y transparencia.",
+    "transparency": "Muro de Transparencia",
+    "contact": "Contacto"
+  },
+  "pay_info": {
+    "title": "Dona ahora mismo",
+    "subtitle": "Transfiere al monto que quieras y confrímalo en nuestra web para que podamos verificarlo.",
+    "cta": "Confirmar mi pago →",
+    "cta_hint": "Registra tu referencia en 30 segundos",
+    "zelle_title": "Zelle",
+    "pago_movil_title": "Pago Móvil",
+    "transfer_title": "Transferencia",
+    "not_configured": "Próximamente"
+  },
+  "team": {
+    "title": "Nuestro equipo",
+    "subtitle": "Las personas detrás de cada compra, cada recibo y cada entrega en Barquisimeto."
+  },
+  "donar": {
+    "page_title": "Hacer una donación — SendHope Venezuela",
+    "page_description": "Elige un monto, realiza la transferencia y confirma tu referencia. Tu donación queda registrada y verificada por el equipo.",
+    "back": "← Volver",
+    "mini_hero_title": "Haz tu donación",
+    "mini_hero_subtitle": "El equipo confirma tu transferencia en menos de 24 horas. Cada bolívar queda documentado.",
+    "step1_label": "01",
+    "step1_title": "¿Cuánto quieres donar?",
+    "amount_custom_placeholder": "Otro monto en USD",
+    "step2_label": "02",
+    "step2_title": "Realiza el pago",
+    "step2_subtitle": "Elige el método que prefieras y realiza la transferencia al monto que elegiste.",
+    "tab_zelle": "Zelle",
+    "tab_pago_movil": "Pago Móvil",
+    "tab_transfer": "Transferencia",
+    "zelle_label": "Email / Teléfono Zelle",
+    "zelle_name_label": "A nombre de",
+    "pago_movil_phone_label": "Teléfono",
+    "pago_movil_bank_label": "Banco",
+    "pago_movil_cedula_label": "RIF / Cédula",
+    "transfer_bank_label": "Banco",
+    "transfer_account_label": "Cuenta",
+    "step3_label": "03",
+    "step3_title": "Confirma tu transferencia",
+    "step3_subtitle": "Esto nos permite verificar tu pago. Tu nombre y email no se muestran públicamente.",
+    "reference_label": "Referencia de pago *",
+    "reference_placeholder": "Ej: últimos 4 dígitos, código de confirmación...",
+    "reference_hint": "El código o referencia que te dio tu banco / Zelle al hacer la transferencia.",
+    "name_label": "Tu nombre",
+    "name_placeholder": "Cómo quieres aparecer en el Muro de Transparencia",
+    "email_label": "Email de contacto",
+    "email_placeholder": "Opcional — te avisamos cuando confirmemos",
+    "privacy_toggle_label": "¿Cómo quieres que aparezca tu donación?",
+    "public_option": "Con mi nombre",
+    "public_option_hint": "Tu nombre aparecerá en el Muro de Transparencia",
+    "anonymous_option": "Anónimamente",
+    "anonymous_option_hint": "Tu donación se registra sin nombre visible",
+    "privacy_note": "Tu email no se mostrará nunca de forma pública.",
+    "submit": "Confirmar donación de {amount}",
+    "submitting": "Registrando...",
+    "error_amount": "Elige o ingresa un monto válido.",
+    "error_reference": "La referencia es requerida para verificar tu pago.",
+    "error_generic": "Algo salió mal. Intenta de nuevo o escríbenos directamente.",
+    "success_title": "¡Gracias por donar!",
+    "success_body": "Recibimos la confirmación de tu transferencia. El equipo la verificará en las próximas horas y quedará publicada en el Muro de Transparencia.",
+    "success_cta": "Ver el Muro de Transparencia",
+    "success_back": "Volver al inicio",
+    "success_another": "Hacer otra donación"
+  }
+}
