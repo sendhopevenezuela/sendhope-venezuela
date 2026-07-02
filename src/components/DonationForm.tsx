@@ -6,32 +6,47 @@ import { CheckCircle, AlertCircle } from "lucide-react";
 import { createDonation, type DonateResult } from "@/app/actions/donate";
 
 // ── Tipos ────────────────────────────────────────────────────────────────────
-type PaymentMethod = "zelle" | "pago_movil" | "transfer";
+type PaymentMethod = "zelle" | "pago_movil" | "transfer" | "paypal" | "otros";
 type PrivacyMode = "anonymous" | "public";
 
-type PaymentInfo = {
-  zelleContact: string;
-  zelleName: string;
-  pagoMovilPhone: string;
-  pagoMovilBank: string;
-  pagoMovilCedula: string;
-  transferBank: string;
-  transferAccount: string;
+type ZelleDetails = { contact: string; name: string };
+type PagoMovilDetails = { phone: string; bank: string; cedula: string };
+type TransferDetails = { bank: string; account: string; name?: string; cedula?: string };
+type PaypalDetails = { contact: string; name: string };
+type OtrosDetails = { instructions: string };
+
+type PaymentMethodItem = {
+  id: string;
+  type: PaymentMethod;
+  title: string;
+  details: ZelleDetails | PagoMovilDetails | TransferDetails | PaypalDetails | OtrosDetails;
+  is_active: boolean;
 };
 
 const PRESET_AMOUNTS = [5, 10, 25, 50] as const;
 
 // ── Componente principal ──────────────────────────────────────────────────────
-export function DonationForm({ payment }: { payment: PaymentInfo }) {
+export function DonationForm({ paymentMethods }: { paymentMethods: PaymentMethodItem[] }) {
   const t = useTranslations("donar");
   const [isPending, startTransition] = useTransition();
+
+  // Filtrar tipos de pago que tengan al menos una cuenta activa
+  const availableTabs = [
+    { id: "zelle" as const, label: t("tab_zelle"), count: paymentMethods.filter(m => m.type === "zelle").length },
+    { id: "pago_movil" as const, label: t("tab_pago_movil"), count: paymentMethods.filter(m => m.type === "pago_movil").length },
+    { id: "transfer" as const, label: t("tab_transfer"), count: paymentMethods.filter(m => m.type === "transfer").length },
+    { id: "paypal" as const, label: t("tab_paypal"), count: paymentMethods.filter(m => m.type === "paypal").length },
+    { id: "otros" as const, label: t("tab_otros"), count: paymentMethods.filter(m => m.type === "otros").length },
+  ].filter(tab => tab.count > 0);
 
   // Selección de monto
   const [selectedPreset, setSelectedPreset] = useState<number | null>(10);
   const [customAmount, setCustomAmount] = useState("");
 
   // Método de pago activo
-  const [activeMethod, setActiveMethod] = useState<PaymentMethod>("zelle");
+  const [activeMethod, setActiveMethod] = useState<PaymentMethod>(() => {
+    return availableTabs[0]?.id ?? "zelle";
+  });
 
   // Modo privacidad — anónimo por defecto (menos fricción)
   const [privacyMode, setPrivacyMode] = useState<PrivacyMode>("anonymous");
@@ -138,12 +153,6 @@ export function DonationForm({ payment }: { payment: PaymentInfo }) {
     );
   }
 
-  const tabs: { id: PaymentMethod; label: string }[] = [
-    { id: "zelle", label: t("tab_zelle") },
-    { id: "pago_movil", label: t("tab_pago_movil") },
-    { id: "transfer", label: t("tab_transfer") },
-  ];
-
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-10">
       {/* ── PASO 1: Monto ─────────────────────────────────────────────────── */}
@@ -218,7 +227,7 @@ export function DonationForm({ payment }: { payment: PaymentInfo }) {
           role="tablist"
           aria-label="Método de pago"
         >
-          {tabs.map((tab) => (
+          {availableTabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -237,25 +246,92 @@ export function DonationForm({ payment }: { payment: PaymentInfo }) {
         </div>
 
         {/* Detalle del método seleccionado */}
-        <div className="bg-white rounded-2xl border-2 border-navy/10 p-5">
+        <div className="bg-white rounded-2xl border-2 border-navy/10 p-5 flex flex-col gap-5">
           {activeMethod === "zelle" && (
-            <dl className="flex flex-col gap-3">
-              <PaymentRow label={t("zelle_label")} value={payment.zelleContact} copyable />
-              <PaymentRow label={t("zelle_name_label")} value={payment.zelleName} />
-            </dl>
+            <div className="flex flex-col gap-5">
+              {paymentMethods.filter(m => m.type === "zelle").map((m, idx) => {
+                const details = m.details as ZelleDetails;
+                return (
+                  <div key={m.id} className={idx > 0 ? "pt-5 border-t border-dashed border-navy/10" : ""}>
+                    <p className="font-sans font-bold text-xs text-navy/60 uppercase tracking-wider mb-2.5">{m.title}</p>
+                    <dl className="flex flex-col gap-3">
+                      <PaymentRow label={t("zelle_label")} value={details.contact} copyable />
+                      <PaymentRow label={t("zelle_name_label")} value={details.name} />
+                    </dl>
+                  </div>
+                );
+              })}
+            </div>
           )}
+
           {activeMethod === "pago_movil" && (
-            <dl className="flex flex-col gap-3">
-              <PaymentRow label={t("pago_movil_phone_label")} value={payment.pagoMovilPhone} copyable />
-              <PaymentRow label={t("pago_movil_bank_label")} value={payment.pagoMovilBank} />
-              <PaymentRow label={t("pago_movil_cedula_label")} value={payment.pagoMovilCedula} copyable />
-            </dl>
+            <div className="flex flex-col gap-5">
+              {paymentMethods.filter(m => m.type === "pago_movil").map((m, idx) => {
+                const details = m.details as PagoMovilDetails;
+                return (
+                  <div key={m.id} className={idx > 0 ? "pt-5 border-t border-dashed border-navy/10" : ""}>
+                    <p className="font-sans font-bold text-xs text-navy/60 uppercase tracking-wider mb-2.5">{m.title}</p>
+                    <dl className="flex flex-col gap-3">
+                      <PaymentRow label={t("pago_movil_phone_label")} value={details.phone} copyable />
+                      <PaymentRow label={t("pago_movil_bank_label")} value={details.bank} />
+                      <PaymentRow label={t("pago_movil_cedula_label")} value={details.cedula} copyable />
+                    </dl>
+                  </div>
+                );
+              })}
+            </div>
           )}
+
           {activeMethod === "transfer" && (
-            <dl className="flex flex-col gap-3">
-              <PaymentRow label={t("transfer_bank_label")} value={payment.transferBank} />
-              <PaymentRow label={t("transfer_account_label")} value={payment.transferAccount} copyable />
-            </dl>
+            <div className="flex flex-col gap-5">
+              {paymentMethods.filter(m => m.type === "transfer").map((m, idx) => {
+                const details = m.details as TransferDetails;
+                return (
+                  <div key={m.id} className={idx > 0 ? "pt-5 border-t border-dashed border-navy/10" : ""}>
+                    <p className="font-sans font-bold text-xs text-navy/60 uppercase tracking-wider mb-2.5">{m.title}</p>
+                    <dl className="flex flex-col gap-3">
+                      <PaymentRow label={t("transfer_bank_label")} value={details.bank} />
+                      <PaymentRow label={t("transfer_account_label")} value={details.account} copyable />
+                      {details.name && <PaymentRow label="Titular" value={details.name} />}
+                      {details.cedula && <PaymentRow label="Cédula / RIF" value={details.cedula} copyable />}
+                    </dl>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeMethod === "paypal" && (
+            <div className="flex flex-col gap-5">
+              {paymentMethods.filter(m => m.type === "paypal").map((m, idx) => {
+                const details = m.details as PaypalDetails;
+                return (
+                  <div key={m.id} className={idx > 0 ? "pt-5 border-t border-dashed border-navy/10" : ""}>
+                    <p className="font-sans font-bold text-xs text-navy/60 uppercase tracking-wider mb-2.5">{m.title}</p>
+                    <dl className="flex flex-col gap-3">
+                      <PaymentRow label="Email de PayPal" value={details.contact} copyable />
+                      <PaymentRow label="Titular" value={details.name} />
+                    </dl>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {activeMethod === "otros" && (
+            <div className="flex flex-col gap-5">
+              {paymentMethods.filter(m => m.type === "otros").map((m, idx) => {
+                const details = m.details as OtrosDetails;
+                return (
+                  <div key={m.id} className={idx > 0 ? "pt-5 border-t border-dashed border-navy/10" : ""}>
+                    <p className="font-sans font-bold text-xs text-navy/60 uppercase tracking-wider mb-2.5">{m.title}</p>
+                    <div className="bg-[#EEF4FF]/50 border border-[#003082]/10 rounded-xl px-4 py-3 text-sm text-[#0A1628] leading-relaxed whitespace-pre-line">
+                      {details.instructions}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
 
           {/* Monto a transferir — calculado en vivo */}

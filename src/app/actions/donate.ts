@@ -8,7 +8,7 @@ export type DonateResult =
 
 export type DonateInput = {
   amount: number;
-  paymentMethod: "zelle" | "pago_movil" | "transfer";
+  paymentMethod: "zelle" | "pago_movil" | "transfer" | "paypal" | "otros";
   referenceNote: string;
   donorName?: string;
   donorEmail?: string;

@@ -6,45 +6,45 @@ import { CopyButton } from "./CopyButton";
 // ── Fetch de datos de pago ──────────────────────────────────────────────────
 // Si no hay datos en la DB o falla, retorna datos de ejemplo visibles
 // para que el diseño no quede oculto ni roto.
-async function getPaymentInfo() {
-  const defaults = {
-    zelleContact:    "donaciones@sendhope.org",
-    zelleName:       "SendHope Venezuela",
-    pagoMovilPhone:  "0412-123-4567",
-    pagoMovilBank:   "Banco de Venezuela",
-    pagoMovilCedula: "J-12345678-9",
-    transferBank:    "Banesco",
-    transferAccount: "0134-1234-56-1234567890",
-  };
+async function getPaymentMethods() {
+  const defaults = [
+    {
+      id: "default-zelle",
+      type: "zelle",
+      title: "Zelle Principal",
+      details: { contact: "sendhopevenezuela@gmail.com", name: "SendHope Venezuela" }
+    },
+    {
+      id: "default-pago-movil",
+      type: "pago_movil",
+      title: "Pago Móvil",
+      details: { phone: "0412-9292701", bank: "Banco Mercantil", cedula: "V-12345678" }
+    },
+    {
+      id: "default-transfer",
+      type: "transfer",
+      title: "Transferencia Bancaria",
+      details: { bank: "Banesco", account: "0134-0000-00-0000000000", name: "SendHope Venezuela", cedula: "J-12345678-9" }
+    }
+  ];
 
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from("payment_config")
-      .select(
-        "zelle_contact, zelle_name, pago_movil_phone, pago_movil_bank, pago_movil_cedula, transfer_bank, transfer_account"
-      )
-      .eq("id", 1)
-      .maybeSingle();
+      .from("payment_methods")
+      .select("*")
+      .eq("is_active", true)
+      .order("order_index");
 
     if (error) {
-      console.error("[QuickPaySection getPaymentInfo] Supabase error:", error.message, error.details);
+      console.error("[QuickPaySection getPaymentMethods] Supabase error:", error.message);
       return defaults;
     }
-    if (!data) {
-      console.warn("[QuickPaySection getPaymentInfo] No row found with id = 1 in payment_config");
+    if (!data || data.length === 0) {
       return defaults;
     }
 
-    return {
-      zelleContact:    data.zelle_contact    ?? defaults.zelleContact,
-      zelleName:       data.zelle_name       ?? defaults.zelleName,
-      pagoMovilPhone:  data.pago_movil_phone  ?? defaults.pagoMovilPhone,
-      pagoMovilBank:   data.pago_movil_bank   ?? defaults.pagoMovilBank,
-      pagoMovilCedula: data.pago_movil_cedula ?? defaults.pagoMovilCedula,
-      transferBank:    data.transfer_bank    ?? defaults.transferBank,
-      transferAccount: data.transfer_account  ?? defaults.transferAccount,
-    };
+    return data;
   } catch {
     return defaults;
   }
@@ -78,7 +78,7 @@ function Field({
 // ── Componente principal ──────────────────────────────────────────────────────
 export async function QuickPaySection() {
   const t = await getTranslations("pay_info");
-  const p = await getPaymentInfo();
+  const methods = await getPaymentMethods();
 
   return (
     // Borde dorado arriba: transición visual del hero azul hacia el blanco
@@ -110,61 +110,96 @@ export async function QuickPaySection() {
 
         {/* ── Cards de métodos de pago ────────────────────────────────────── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Zelle */}
-          <div className="rounded-2xl border-2 border-navy/10 bg-cream p-5 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              {/* Stripe de colores bandera como identificador de método */}
-              <span className="flex flex-col gap-[2px]">
-                <span className="block w-3 h-[2px] rounded-full bg-gold" />
-                <span className="block w-3 h-[2px] rounded-full bg-navy" />
-                <span className="block w-3 h-[2px] rounded-full bg-scarlet" />
-              </span>
-              <h3 className="font-mono font-600 text-navy text-sm uppercase tracking-widest">
-                {t("zelle_title")}
-              </h3>
-            </div>
-            <dl className="flex flex-col gap-3">
-              <Field label="Email / Teléfono" value={p.zelleContact} copyable />
-              <Field label="A nombre de" value={p.zelleName} />
-            </dl>
-          </div>
+          {methods.map((m) => {
+            const isZelle = m.type === "zelle";
+            const isPagoMovil = m.type === "pago_movil";
+            const isTransfer = m.type === "transfer";
+            const isPaypal = m.type === "paypal";
+            const isOtros = m.type === "otros";
+            const details = m.details as Record<string, string>;
 
-          {/* Pago Móvil */}
-          <div className="rounded-2xl border-2 border-navy/10 bg-cream p-5 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <span className="flex flex-col gap-[2px]">
-                <span className="block w-3 h-[2px] rounded-full bg-gold" />
-                <span className="block w-3 h-[2px] rounded-full bg-navy" />
-                <span className="block w-3 h-[2px] rounded-full bg-scarlet" />
-              </span>
-              <h3 className="font-mono font-600 text-navy text-sm uppercase tracking-widest">
-                {t("pago_movil_title")}
-              </h3>
-            </div>
-            <dl className="flex flex-col gap-3">
-              <Field label="Teléfono" value={p.pagoMovilPhone} copyable />
-              <Field label="Banco" value={p.pagoMovilBank} />
-              <Field label="RIF / Cédula" value={p.pagoMovilCedula} copyable />
-            </dl>
-          </div>
+            return (
+              <div key={m.id} className="rounded-2xl border-2 border-navy/10 bg-cream p-5 flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  {/* Stripe de colores bandera como identificador de método */}
+                  <span className="flex flex-col gap-[2px]">
+                    <span className="block w-3 h-[2px] rounded-full bg-gold" />
+                    <span className="block w-3 h-[2px] rounded-full bg-navy" />
+                    <span className="block w-3 h-[2px] rounded-full bg-scarlet" />
+                  </span>
+                  <h3 className="font-mono font-600 text-navy text-sm uppercase tracking-widest">
+                    {m.title}
+                  </h3>
+                </div>
+                <dl className="flex flex-col gap-3">
+                  {isZelle && (
+                    <>
+                      <Field label="Email / Teléfono" value={details.contact ?? ""} copyable />
+                      <Field label="A nombre de" value={details.name ?? ""} />
+                    </>
+                  )}
+                  {isPagoMovil && (
+                    <>
+                      <Field label="Teléfono" value={details.phone ?? ""} copyable />
+                      <Field label="Banco" value={details.bank ?? ""} />
+                      <Field label="RIF / Cédula" value={details.cedula ?? ""} copyable />
+                    </>
+                  )}
+                  {isTransfer && (
+                    <>
+                      <Field label="Banco" value={details.bank ?? ""} />
+                      <Field label="Cuenta" value={details.account ?? ""} copyable />
+                      {details.name && <Field label="A nombre de" value={details.name} />}
+                      {details.cedula && <Field label="Cédula / RIF" value={details.cedula} copyable />}
+                    </>
+                  )}
+                  {isPaypal && (
+                    <>
+                      <Field label="Email de PayPal" value={details.contact ?? ""} copyable />
+                      {details.name && <Field label="Titular" value={details.name} />}
+                    </>
+                  )}
+                  {isOtros && (
+                    <div>
+                      <dt className="font-mono text-[10px] uppercase tracking-[0.15em] text-navy/40 mb-1">Instrucciones</dt>
+                      <dd className="font-sans text-xs text-navy/80 leading-relaxed whitespace-pre-line">
+                        {details.instructions ?? ""}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Transferencia */}
-          <div className="rounded-2xl border-2 border-navy/10 bg-cream p-5 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <span className="flex flex-col gap-[2px]">
-                <span className="block w-3 h-[2px] rounded-full bg-gold" />
-                <span className="block w-3 h-[2px] rounded-full bg-navy" />
-                <span className="block w-3 h-[2px] rounded-full bg-scarlet" />
-              </span>
-              <h3 className="font-mono font-600 text-navy text-sm uppercase tracking-widest">
-                {t("transfer_title")}
+        {/* ── Donaciones Físicas Coordination Banner ── */}
+        <div className="mt-8 bg-verified-light/30 border border-verified/20 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-start gap-4">
+            <span className="text-3xl mt-0.5">📦</span>
+            <div>
+              <h3 className="font-sans font-bold text-base text-navy">
+                ¿Deseas donar insumos físicos en Barquisimeto?
               </h3>
+              <p className="font-sans text-xs md:text-sm text-navy/85 mt-1 leading-relaxed">
+                Coordinamos entregas directas de ropa, cobijas, alimentos no perecederos o medicinas. Escríbenos a cualquiera de nuestros WhatsApps de atención:
+              </p>
+              <div className="flex gap-4 flex-wrap mt-2 font-mono text-xs text-navy font-semibold">
+                <a href="https://wa.me/584129292701" target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                  💬 0412-9292701
+                </a>
+                <a href="https://wa.me/584121519715" target="_blank" rel="noopener noreferrer" className="hover:underline flex items-center gap-1">
+                  💬 0412-1519715
+                </a>
+              </div>
             </div>
-            <dl className="flex flex-col gap-3">
-              <Field label="Banco" value={p.transferBank} />
-              <Field label="Cuenta" value={p.transferAccount} copyable />
-            </dl>
           </div>
+          <a
+            href="mailto:sendhopevenezuela@gmail.com"
+            className="flex-shrink-0 bg-navy text-white hover:bg-navy-mid px-5 py-2.5 rounded-xl font-sans font-600 text-xs transition-colors duration-150"
+          >
+            Contacto por Correo
+          </a>
         </div>
       </div>
     </section>

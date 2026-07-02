@@ -3,8 +3,8 @@
     "donar": "Donate now"
   },
   "hero": {
-    "headline": "Every dollar reaches the shelter — with a photo and a receipt.",
-    "subheadline": "We channel direct donations to families displaced by the June 2026 floods in Barquisimeto, Venezuela. No middlemen. Every purchase documented.",
+    "headline": "Every donation safely reaches the shelters and collection centers.",
+    "subheadline": "We channel direct humanitarian aid to those affected by the July 24 earthquake tragedy. We purchase supplies in Barquisimeto and Caracas and deliver them to official collection centers and shelters in Caracas, La Guaira, and Barquisimeto. Non-profit.",
     "cta": "Donate now",
     "stat_label": "raised so far",
     "stat_empty": "Be the first to donate",
@@ -14,16 +14,16 @@
     "title": "How it works",
     "step1_title": "You donate",
     "step1_body": "A direct, secure transfer from wherever you are. You get immediate confirmation.",
-    "step2_title": "We buy in Barquisimeto",
-    "step2_body": "Our ground team purchases food, water, and essential supplies — receipt in hand, no unaccounted cash.",
+    "step2_title": "We buy and distribute",
+    "step2_body": "We purchase food, medicine, and water in Barquisimeto and Caracas. We deliver them directly to shelters and official collection centers, receipt in hand.",
     "step3_title": "We deliver with proof",
     "step3_body": "Every shelter delivery is photographed before the cycle closes. No photo, no publication.",
     "step4_title": "It stays public forever",
-    "step4_body": "The purchase, scanned receipt, and delivery photo are published on the Transparency Wall. Anyone can see them."
+    "step4_body": "The purchase, scanned invoice, and delivery photo are published on the Transparency Wall. Anyone can view them."
   },
   "transparency": {
     "title": "Transparency Wall",
-    "subtitle": "Real purchases, real receipts, real shelters.",
+    "subtitle": "Real purchases, real invoices, verified deliveries.",
     "cta": "See all",
     "purchase_label": "Verified purchase",
     "delivery_label": "Delivered to"
@@ -58,7 +58,7 @@
   },
   "team": {
     "title": "Our team",
-    "subtitle": "The people behind every purchase, every receipt, and every delivery in Barquisimeto."
+    "subtitle": "The people behind every purchase, every receipt, and every delivery in Barquisimeto, Caracas, and La Guaira."
   },
   "donar": {
     "page_title": "Make a donation — SendHope Venezuela",
@@ -75,6 +75,8 @@
     "tab_zelle": "Zelle",
     "tab_pago_movil": "Pago Móvil",
     "tab_transfer": "Bank transfer",
+    "tab_paypal": "PayPal",
+    "tab_otros": "Others",
     "zelle_label": "Zelle email / phone",
     "zelle_name_label": "Name on account",
     "pago_movil_phone_label": "Phone",
@@ -108,5 +110,31 @@
     "success_cta": "See the Transparency Wall",
     "success_back": "Back to home",
     "success_another": "Make another donation"
+  },
+  "admin_auth": {
+    "title": "Control Panel",
+    "subtitle": "Enter your credentials to access the SendHope Venezuela backoffice.",
+    "username_label": "Username",
+    "username_placeholder": "Enter your username",
+    "password_label": "Password",
+    "password_placeholder": "Enter your password",
+    "login_button": "Log in to Panel",
+    "logging_in": "Verifying...",
+    "logout_button": "Log out",
+    "welcome_admin": "Welcome, Administrator",
+    "dashboard_title": "Administration Panel",
+    "register_title": "Register Administrator",
+    "register_subtitle": "Create a new administrator account using the secret security code.",
+    "code_label": "Registration Code",
+    "code_placeholder": "Enter the secret code",
+    "confirm_password_label": "Confirm Password",
+    "confirm_password_placeholder": "Confirm your password",
+    "register_button": "Create Account",
+    "registering": "Creating account...",
+    "success_register": "Account created successfully. You can now log in.",
+    "error_code": "The registration code is incorrect.",
+    "error_password_match": "Passwords do not match.",
+    "error_username_exists": "The username is already registered.",
+    "to_login_link": "Already have an account, log in"
   }
 }

@@ -4,6 +4,12 @@ import createNextIntlPlugin from "next-intl/plugin";
 // next-intl sin locale en URL — request config en src/i18n/request.ts
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
+  },
+};
 
 export default withNextIntl(nextConfig);

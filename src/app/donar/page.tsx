@@ -14,60 +14,54 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// ── Datos de pago desde la base de datos ─────────────────────────────────────
-// Tabla: public.payment_config (singleton, id = 1).
-// Se leen con la anon key — la política RLS permite SELECT público.
-// Si algún campo es null (aún sin configurar), se muestra "—" para
-// que la página no quede en blanco ni lance error.
-async function getPaymentInfo() {
-  const defaults = {
-    zelleContact:    "donaciones@sendhope.org",
-    zelleName:       "SendHope Venezuela",
-    pagoMovilPhone:  "0412-123-4567",
-    pagoMovilBank:   "Banco de Venezuela",
-    pagoMovilCedula: "J-12345678-9",
-    transferBank:    "Banesco",
-    transferAccount: "0134-1234-56-1234567890",
-  };
+async function getPaymentMethods() {
+  const defaults = [
+    {
+      id: "default-zelle",
+      type: "zelle",
+      title: "Zelle Principal",
+      details: { contact: "donaciones@sendhope.org", name: "SendHope Venezuela" }
+    },
+    {
+      id: "default-pago-movil",
+      type: "pago_movil",
+      title: "Pago Móvil",
+      details: { phone: "0412-123-4567", bank: "Banco de Venezuela", cedula: "J-12345678-9" }
+    },
+    {
+      id: "default-transfer",
+      type: "transfer",
+      title: "Transferencia Bancaria",
+      details: { bank: "Banesco", account: "0134-1234-56-1234567890", name: "SendHope Venezuela", cedula: "J-12345678-9" }
+    }
+  ];
 
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
-      .from("payment_config")
-      .select(
-        "zelle_contact, zelle_name, pago_movil_phone, pago_movil_bank, pago_movil_cedula, transfer_bank, transfer_account"
-      )
-      .eq("id", 1)
-      .maybeSingle();
+      .from("payment_methods")
+      .select("*")
+      .eq("is_active", true)
+      .order("order_index");
 
     if (error) {
-      console.error("[DonarPage getPaymentInfo] Supabase error:", error.message, error.details);
+      console.error("[DonarPage getPaymentMethods] Supabase error:", error.message);
       return defaults;
     }
-    if (!data) {
-      console.warn("[DonarPage getPaymentInfo] No row found with id = 1 in payment_config");
+    if (!data || data.length === 0) {
       return defaults;
     }
 
-    return {
-      zelleContact:    data.zelle_contact    ?? defaults.zelleContact,
-      zelleName:       data.zelle_name       ?? defaults.zelleName,
-      pagoMovilPhone:  data.pago_movil_phone  ?? defaults.pagoMovilPhone,
-      pagoMovilBank:   data.pago_movil_bank   ?? defaults.pagoMovilBank,
-      pagoMovilCedula: data.pago_movil_cedula ?? defaults.pagoMovilCedula,
-      transferBank:    data.transfer_bank    ?? defaults.transferBank,
-      transferAccount: data.transfer_account  ?? defaults.transferAccount,
-    };
+    return data;
   } catch {
     return defaults;
   }
 }
 
 
-// ── Page ─────────────────────────────────────────────────────────────────────
 export default async function DonarPage() {
   const t = await getTranslations("donar");
-  const payment = await getPaymentInfo();
+  const paymentMethods = await getPaymentMethods();
 
   return (
     <>
@@ -117,7 +111,7 @@ export default async function DonarPage() {
             </div>
 
             {/* Formulario en sí */}
-            <DonationForm payment={payment} />
+            <DonationForm paymentMethods={paymentMethods} />
           </div>
         </section>
       </main>

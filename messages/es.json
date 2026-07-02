@@ -3,8 +3,8 @@
     "donar": "Donar ahora"
   },
   "hero": {
-    "headline": "Cada bolívar llega al refugio con foto y recibo.",
-    "subheadline": "Canalizamos donaciones directas hacia las familias afectadas por las inundaciones de junio de 2026 en Barquisimeto. Sin intermediarios. Cada compra documentada.",
+    "headline": "Cada donación llega segura a los refugios y centros de acopio.",
+    "subheadline": "Canalizamos ayuda humanitaria directa para los afectados por la tragedia del terremoto del 24 de julio. Compramos insumos en Barquisimeto y Caracas y los entregamos en centros de acopio oficiales y refugios en Caracas, La Guaira y Barquisimeto. Sin fines de lucro.",
     "cta": "Donar ahora",
     "stat_label": "recaudado hasta hoy",
     "stat_empty": "Sé el primero en donar",
@@ -14,16 +14,16 @@
     "title": "Cómo funciona",
     "step1_title": "Haces tu donación",
     "step1_body": "Transferencia directa y segura desde donde estés. Recibes confirmación inmediata.",
-    "step2_title": "Compramos en Barquisimeto",
-    "step2_body": "El equipo en campo compra alimentos, agua y artículos de primera necesidad — recibo en mano, nada en efectivo suelto.",
+    "step2_title": "Compramos y distribuimos",
+    "step2_body": "Adquirimos alimentos, medicinas y agua en Barquisimeto y Caracas. Los entregamos directamente en refugios y centros de acopio oficiales, con recibo en mano.",
     "step3_title": "Documentamos la entrega",
     "step3_body": "Cada entrega al refugio queda fotografiada antes de cerrar el ciclo. Sin foto, no se publica.",
     "step4_title": "Queda público para siempre",
-    "step4_body": "La compra, el recibo escaneado y la foto de entrega se publican en el Muro de Transparencia. Cualquiera puede verlos."
+    "step4_body": "La compra, la factura escaneada y la foto de entrega se publican en el Muro de Transparencia. Cualquiera puede verlos."
   },
   "transparency": {
     "title": "Muro de Transparencia",
-    "subtitle": "Compras reales, recibos reales, refugios reales.",
+    "subtitle": "Compras reales, facturas reales, entregas verificadas.",
     "cta": "Ver todo",
     "purchase_label": "Compra verificada",
     "delivery_label": "Entregado a"
@@ -58,7 +58,7 @@
   },
   "team": {
     "title": "Nuestro equipo",
-    "subtitle": "Las personas detrás de cada compra, cada recibo y cada entrega en Barquisimeto."
+    "subtitle": "Las personas detrás de cada compra, cada recibo y cada entrega en Barquisimeto, Caracas y La Guaira."
   },
   "donar": {
     "page_title": "Hacer una donación — SendHope Venezuela",
@@ -75,6 +75,8 @@
     "tab_zelle": "Zelle",
     "tab_pago_movil": "Pago Móvil",
     "tab_transfer": "Transferencia",
+    "tab_paypal": "PayPal",
+    "tab_otros": "Otros",
     "zelle_label": "Email / Teléfono Zelle",
     "zelle_name_label": "A nombre de",
     "pago_movil_phone_label": "Teléfono",
@@ -108,5 +110,31 @@
     "success_cta": "Ver el Muro de Transparencia",
     "success_back": "Volver al inicio",
     "success_another": "Hacer otra donación"
+  },
+  "admin_auth": {
+    "title": "Panel de Control",
+    "subtitle": "Ingresa tus credenciales para acceder al backoffice de SendHope Venezuela.",
+    "username_label": "Usuario",
+    "username_placeholder": "Ingresa tu usuario",
+    "password_label": "Contraseña",
+    "password_placeholder": "Ingresa tu contraseña",
+    "login_button": "Ingresar al Panel",
+    "logging_in": "Verificando...",
+    "logout_button": "Cerrar sesión",
+    "welcome_admin": "Bienvenido, Administrador",
+    "dashboard_title": "Panel de Administración",
+    "register_title": "Registrar Administrador",
+    "register_subtitle": "Crea una nueva cuenta de administrador usando el código de seguridad secreto.",
+    "code_label": "Código de Registro",
+    "code_placeholder": "Ingresa el código secreto",
+    "confirm_password_label": "Confirmar Contraseña",
+    "confirm_password_placeholder": "Confirma tu contraseña",
+    "register_button": "Crear Cuenta",
+    "registering": "Creando cuenta...",
+    "success_register": "Cuenta creada con éxito. Ahora puedes iniciar sesión.",
+    "error_code": "El código de registro es incorrecto.",
+    "error_password_match": "Las contraseñas no coinciden.",
+    "error_username_exists": "El nombre de usuario ya está registrado.",
+    "to_login_link": "Ya tengo cuenta, iniciar sesión"
   }
 }
