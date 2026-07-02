@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTransition, useState } from "react";
 import { updatePurchase } from "@/app/actions/purchases";
 import { PhotoUploader } from "@/components/admin/PhotoUploader";
+import { DonationLinker } from "@/components/admin/DonationLinker";
 
 const CATEGORIES = ["alimentos", "medicinas", "agua", "aseo", "otros"];
 const CURRENCIES = ["USD", "VES", "EUR"];
@@ -21,7 +22,25 @@ type Purchase = {
   purchase_photos: Photo[];
 };
 
-export default function EditarCompraClient({ purchase }: { purchase: Purchase }) {
+type Donation = {
+  id: string;
+  donor_name: string | null;
+  amount: number;
+  currency: string;
+  reference_note: string | null;
+  tracking_code: string | null;
+  created_at: string;
+};
+
+export default function EditarCompraClient({
+  purchase,
+  allDonations,
+  initialLinkedIds,
+}: {
+  purchase: Purchase;
+  allDonations: Donation[];
+  initialLinkedIds: string[];
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +138,21 @@ export default function EditarCompraClient({ purchase }: { purchase: Purchase })
           <PhotoUploader type="receipt" label="Recibo" existingPhotos={photosOf("receipt")} />
           <PhotoUploader type="product" label="Producto" existingPhotos={photosOf("product")} />
           <PhotoUploader type="delivery" label="Entrega al refugio" existingPhotos={photosOf("delivery")} />
+        </div>
+
+        {/* Donaciones vinculadas */}
+        <div className="bg-white rounded-2xl border border-[#003082]/10 p-6 flex flex-col gap-4">
+          <div>
+            <h2 className="font-sans font-semibold text-base text-[#0A1628]">Donaciones Vinculadas</h2>
+            <p className="font-sans text-xs text-[#64748B] mt-1">
+              Asocia qué donaciones confirmadas financiaron esta compra. Los donantes podrán buscar su credencial en el Muro de Transparencia.
+            </p>
+          </div>
+          <DonationLinker
+            purchaseId={purchase.id}
+            allDonations={allDonations}
+            initialLinkedIds={initialLinkedIds}
+          />
         </div>
 
         <div className="flex gap-3 justify-end">

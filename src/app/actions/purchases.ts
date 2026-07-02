@@ -306,3 +306,77 @@ export async function updatePurchaseDeliveryStatus(
   revalidatePath("/admin/compras");
   return { success: true };
 }
+
+// ── LINK / UNLINK DONATIONS TO A PURCHASE ────────────────────────────────────
+
+/** Devuelve las donaciones confirmadas disponibles para vincular a una compra */
+export async function getConfirmedDonations(): Promise<{
+  id: string;
+  donor_name: string | null;
+  amount: number;
+  currency: string;
+  reference_note: string | null;
+  tracking_code: string | null;
+  created_at: string;
+}[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("donations")
+    .select("id, donor_name, amount, currency, reference_note, tracking_code, created_at")
+    .eq("status", "confirmed")
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+/** Devuelve los IDs de donaciones actualmente vinculadas a una compra */
+export async function getLinkedDonations(purchaseId: string): Promise<string[]> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("purchase_donations")
+    .select("donation_id")
+    .eq("purchase_id", purchaseId);
+  return (data ?? []).map((r) => r.donation_id);
+}
+
+/** Reemplaza las vinculaciones de donaciones para una compra */
+export async function setLinkedDonations(
+  purchaseId: string,
+  donationIds: string[],
+): Promise<ActionResult> {
+  const supabase = createAdminClient();
+  const adminName = await getAdminName();
+
+  // Borrar vinculaciones existentes
+  const { error: deleteError } = await supabase
+    .from("purchase_donations")
+    .delete()
+    .eq("purchase_id", purchaseId);
+
+  if (deleteError) return { error: `Error al actualizar vinculaciones: ${deleteError.message}` };
+
+  // Insertar nuevas vinculaciones
+  if (donationIds.length > 0) {
+    const rows = donationIds.map((donation_id) => ({
+      purchase_id: purchaseId,
+      donation_id,
+      linked_by: adminName,
+    }));
+    const { error: insertError } = await supabase
+      .from("purchase_donations")
+      .insert(rows);
+    if (insertError) return { error: `Error al vincular donaciones: ${insertError.message}` };
+  }
+
+  await logActivity(
+    supabase,
+    adminName,
+    "linked_donations",
+    "purchase",
+    `Vinculó ${donationIds.length} donación(es) a la compra ${purchaseId}`,
+    purchaseId,
+  );
+
+  revalidatePath(`/admin/compras/${purchaseId}/editar`);
+  return { success: true };
+}
+

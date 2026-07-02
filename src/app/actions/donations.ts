@@ -201,23 +201,45 @@ export async function deleteDonation(id: string): Promise<ActionResult> {
   return { success: true };
 }
 
-// ── SEARCH DONATION BY REFERENCE ─────────────────────────────────────────────
+// ── SEARCH DONATION BY REFERENCE OR TRACKING CODE ────────────────────────────
 
-export async function searchDonationByReference(reference: string) {
-  const cleanRef = reference.trim();
-  if (cleanRef.length < 3) {
+export async function searchDonationByReference(query: string) {
+  const cleanQuery = query.trim();
+  if (cleanQuery.length < 3) {
     return { error: "Ingresa al menos 3 caracteres para buscar." };
   }
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("donations")
-    .select("id, donor_name, amount, currency, created_at, status, reference_note")
-    .or(`reference_note.ilike.%${cleanRef}%,donor_name.ilike.%${cleanRef}%`)
-    .eq("status", "confirmed")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+
+  // Buscar por tracking_code exacto primero (formato SH-XXXXXX)
+  const isTrackingCode = /^SH-[A-Z0-9]{4,8}$/i.test(cleanQuery);
+
+  let data = null;
+  let error = null;
+
+  if (isTrackingCode) {
+    // Búsqueda exacta por tracking_code (no requiere status confirmed)
+    const res = await supabase
+      .from("donations")
+      .select("id, donor_name, amount, currency, created_at, status, reference_note, tracking_code")
+      .ilike("tracking_code", cleanQuery)
+      .limit(1)
+      .maybeSingle();
+    data = res.data;
+    error = res.error;
+  } else {
+    // Búsqueda fuzzy por referencia o nombre (solo confirmadas)
+    const res = await supabase
+      .from("donations")
+      .select("id, donor_name, amount, currency, created_at, status, reference_note, tracking_code")
+      .or(`reference_note.ilike.%${cleanQuery}%,donor_name.ilike.%${cleanQuery}%`)
+      .eq("status", "confirmed")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    data = res.data;
+    error = res.error;
+  }
 
   if (error) {
     console.error("[Donations search] Supabase error:", error.message);
@@ -225,8 +247,28 @@ export async function searchDonationByReference(reference: string) {
   }
 
   if (!data) {
-    return { error: "No encontramos ninguna donación confirmada con esa referencia." };
+    return { error: "No encontramos ninguna donación confirmada con esa referencia o código." };
   }
+
+  // Si encontramos la donación, buscar compras vinculadas
+  const { data: linkedPurchases } = await supabase
+    .from("purchase_donations")
+    .select("purchase_id, purchases(id, item_description, shelter_name, purchase_date, amount, currency)")
+    .eq("donation_id", data.id);
+
+  const purchases = (linkedPurchases ?? []).map((row) => {
+    const raw = row.purchases;
+    const p = Array.isArray(raw) ? raw[0] : raw;
+    if (!p) return null;
+    return {
+      id: (p as any).id as string,
+      item_description: (p as any).item_description as string,
+      shelter_name: (p as any).shelter_name as string,
+      purchase_date: (p as any).purchase_date as string,
+      amount: (p as any).amount as number,
+      currency: (p as any).currency as string,
+    };
+  }).filter((p): p is NonNullable<typeof p> => p !== null);
 
   return {
     donation: {
@@ -235,7 +277,10 @@ export async function searchDonationByReference(reference: string) {
       amount: data.amount,
       currency: data.currency,
       created_at: data.created_at,
+      tracking_code: data.tracking_code,
+      status: data.status,
     },
+    linkedPurchases: purchases,
   };
 }
 

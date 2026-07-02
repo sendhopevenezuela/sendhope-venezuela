@@ -22,12 +22,31 @@ export const metadata: Metadata = {
   title: "SendHope Venezuela — Donaciones verificadas para refugios en Barquisimeto",
   description:
     "Cada bolívar donado se convierte en una compra real con foto y recibo, entregada directamente a los refugios afectados por las inundaciones en Barquisimeto. Transparencia total.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-icon.png",
+    shortcut: "/icon.png",
+  },
   openGraph: {
-    title: "SendHope Venezuela",
+    title: "SendHope Venezuela — Ayuda Verificada al Terremoto del 24 de Julio",
     description:
-      "Donaciones verificadas para refugios en Barquisimeto. Cada compra documentada con foto y recibo.",
+      "Donaciones verificadas para refugios en Barquisimeto, Caracas y La Guaira. Cada compra documentada con foto y recibo. Transparencia total.",
     locale: "es_VE",
     type: "website",
+    images: [
+      {
+        url: "/icon.png",
+        width: 600,
+        height: 600,
+        alt: "SendHope Venezuela",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "SendHope Venezuela",
+    description: "Donaciones verificadas para refugios del terremoto del 24 de julio.",
+    images: ["/icon.png"],
   },
 };
 

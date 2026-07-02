@@ -97,3 +97,37 @@ export async function deleteStorageFile(
     console.warn(`[Storage] Could not delete ${path}:`, error.message);
   }
 }
+
+/**
+ * Sube una foto a la galería de labor del equipo.
+ */
+export async function uploadGalleryPhoto(
+  file: File,
+): Promise<{ url: string; path: string } | { error: string }> {
+  const supabase = createAdminClient();
+
+  const timestamp = Date.now();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${timestamp}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const { error } = await supabase.storage
+    .from("gallery-photos")
+    .upload(path, buffer, {
+      contentType: file.type || "image/jpeg",
+      upsert: false,
+    });
+
+  if (error) {
+    return { error: `Error al subir foto de galería: ${error.message}` };
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from("gallery-photos")
+    .getPublicUrl(path);
+
+  return { url: publicUrlData.publicUrl, path };
+}
+

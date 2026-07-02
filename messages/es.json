@@ -44,6 +44,7 @@
   "footer": {
     "rights": "© 2026 SendHope Venezuela. Hecho desde Barquisimeto con urgencia y transparencia.",
     "transparency": "Muro de Transparencia",
+    "gallery": "Galería",
     "contact": "Contacto"
   },
   "pay_info": {
@@ -59,6 +60,12 @@
   "team": {
     "title": "Nuestro equipo",
     "subtitle": "Las personas detrás de cada compra, cada recibo y cada entrega en Barquisimeto, Caracas y La Guaira."
+  },
+  "about": {
+    "title": "¿Quiénes somos?",
+    "tag": "Nuestra Misión",
+    "description": "Somos un grupo de amigos que, conmovidos por las consecuencias de los terremotos del 24 de junio en Venezuela, decidimos unir disposición y ganas de ayudar para tomar esta iniciativa. Nuestro propósito es canalizar apoyo humanitario inmediato para las familias afectadas, enfocándonos prioritariamente en el bienestar, alimentación y cuidado de los niños pequeños.",
+    "future": "Con la meta fija en el futuro, soñamos con hacer crecer este proyecto, sumando esfuerzos paso a paso para contribuir activamente en la reconstrucción del país."
   },
   "donar": {
     "page_title": "Hacer una donación — SendHope Venezuela",

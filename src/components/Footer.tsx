@@ -24,6 +24,12 @@ export async function Footer() {
             {t("transparency")}
           </Link>
           <Link
+            href="/galeria"
+            className="hover:text-gold transition-colors duration-200"
+          >
+            {t("gallery")}
+          </Link>
+          <Link
             href="/contacto"
             className="hover:text-gold transition-colors duration-200"
           >

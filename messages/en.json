@@ -44,6 +44,7 @@
   "footer": {
     "rights": "SendHope Venezuela. Built with love from Barquisimeto.",
     "transparency": "Transparency Wall",
+    "gallery": "Gallery",
     "contact": "Contact"
   },
   "pay_info": {
@@ -59,6 +60,12 @@
   "team": {
     "title": "Our team",
     "subtitle": "The people behind every purchase, every receipt, and every delivery in Barquisimeto, Caracas, and La Guaira."
+  },
+  "about": {
+    "title": "Who are we?",
+    "tag": "Our Mission",
+    "description": "We are a group of friends who, moved by the consequences of the June 24 earthquakes in Venezuela, decided to combine our disposition and desire to help to launch this initiative. Our purpose is to channel immediate humanitarian support for the affected families, focusing primarily on the well-being, nutrition, and care of young children.",
+    "future": "With our eyes fixed on the future, we dream of growing this project, joining forces step by step to actively contribute to the reconstruction of our country."
   },
   "donar": {
     "page_title": "Make a donation — SendHope Venezuela",

@@ -30,6 +30,17 @@ type FoundDonation = {
   amount: number;
   currency: string;
   created_at: string;
+  tracking_code: string | null;
+  status: string;
+};
+
+type LinkedPurchase = {
+  id: string;
+  item_description: string;
+  shelter_name: string;
+  purchase_date: string;
+  amount: number;
+  currency: string;
 };
 
 const CATEGORIES = [
@@ -51,8 +62,8 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
   // Galería de Lightbox con soporte para múltiples imágenes
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
-
   const [activeInvoice, setActiveInvoice] = useState<PurchaseItem | null>(null);
+  const [linkedPurchases, setLinkedPurchases] = useState<LinkedPurchase[]>([]);
 
   const openLightbox = (images: string[], index = 0) => {
     setLightboxImages(images);
@@ -65,11 +76,12 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
     return p.category?.toLowerCase() === activeCategory.toLowerCase();
   });
 
-  // Buscar donación por referencia
+  // Buscar donación por referencia o credencial
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setSearchError(null);
     setFoundDonation(null);
+    setLinkedPurchases([]);
 
     if (searchRef.trim().length < 3) {
       setSearchError("Ingresa al menos 3 caracteres.");
@@ -82,6 +94,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
         setSearchError(res.error || "Error al buscar la donación");
       } else if (res.donation) {
         setFoundDonation(res.donation);
+        setLinkedPurchases(res.linkedPurchases ?? []);
       }
     });
   }
@@ -152,26 +165,67 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             )}
 
             {foundDonation && (
-              <div className="mt-6 bg-verified-light/40 border border-verified/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fadeIn">
-                <div>
-                  <h3 className="font-sans font-bold text-sm text-verified-dark">
-                    ¡Donación encontrada y confirmada! 🎉
-                  </h3>
-                  <p className="font-sans text-xs text-navy/80 mt-1 leading-relaxed">
-                    Agradecemos enormemente el aporte de{" "}
-                    <strong>{foundDonation.donor_name ?? "Donante Anónimo"}</strong> por un valor de{" "}
-                    <strong>
-                      ${foundDonation.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}{" "}
-                      {foundDonation.currency}
-                    </strong>{" "}
-                    el día {new Date(foundDonation.created_at).toLocaleDateString("es-VE")}.
-                  </p>
+              <div className="mt-6 flex flex-col gap-3 animate-fadeIn">
+                {/* Encabezado donación encontrada */}
+                <div className="bg-verified-light/40 border border-verified/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h3 className="font-sans font-bold text-sm text-verified-dark flex items-center gap-1.5">
+                      ¡Donación encontrada! 🎉
+                      {foundDonation.tracking_code && (
+                        <span className="font-mono text-[10px] bg-navy text-white px-2 py-0.5 rounded-full">
+                          {foundDonation.tracking_code}
+                        </span>
+                      )}
+                    </h3>
+                    <p className="font-sans text-xs text-navy/80 mt-1 leading-relaxed">
+                      Aporte de{" "}
+                      <strong>{foundDonation.donor_name ?? "Donante Anónimo"}</strong>{" "}
+                      por{" "}
+                      <strong>
+                        ${foundDonation.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}{" "}
+                        {foundDonation.currency}
+                      </strong>{" "}
+                      — {new Date(foundDonation.created_at).toLocaleDateString("es-VE")}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-shrink-0 self-start sm:self-center bg-verified text-white font-mono text-[10px] uppercase font-bold tracking-wider px-3 py-1 rounded-full">
-                  Resaltando compras compras
-                </div>
+
+                {/* Compras vinculadas o placeholder */}
+                {linkedPurchases.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    <p className="font-sans text-xs font-semibold text-navy">
+                      🛒 Tu aporte financió {linkedPurchases.length === 1 ? "esta compra" : `estas ${linkedPurchases.length} compras`}:
+                    </p>
+                    {linkedPurchases.map((p) => (
+                      <div key={p.id} className="bg-white border border-[#003082]/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-sans font-semibold text-sm text-[#0A1628] leading-snug">{p.item_description}</p>
+                          <p className="font-sans text-xs text-[#64748B] mt-0.5">
+                            {p.shelter_name} · {new Date(p.purchase_date).toLocaleDateString("es-VE")}
+                          </p>
+                        </div>
+                        <span className="font-mono text-sm font-bold text-navy flex-shrink-0">
+                          ${p.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} {p.currency}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-[#FFF8E7] border border-[#F4C31D]/30 rounded-xl p-4 flex items-start gap-3">
+                    <span className="text-xl flex-shrink-0">⏳</span>
+                    <div>
+                      <p className="font-sans font-semibold text-sm text-[#92400E]">
+                        Tu donación está por ser utilizada
+                      </p>
+                      <p className="font-sans text-xs text-[#92400E]/80 mt-1 leading-relaxed">
+                        Hemos recibido tu aporte y está siendo asignado a la próxima compra de insumos para los refugios. Vuelve a buscar tu código en unos días para ver en qué se utilizó. ¡Gracias por tu confianza!
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
+
           </section>
 
           {/* ── Filtro de Categorías ────────────────────────────────────── */}
@@ -444,8 +498,11 @@ function PurchaseCard({
     .filter((p) => p.photo_type === "delivery")
     .map((p) => p.photo_url);
 
-  // Foto de portada (frente): prioridad entrega > producto > placeholder
-  const coverPhoto = deliveryPhotos[0] ?? productPhotos[0] ?? "/placeholder-help.jpg";
+  // Foto de portada (frente): prioridad entrega > producto > null (placeholder SVG inline)
+  const coverPhoto = deliveryPhotos[0] ?? productPhotos[0] ?? null;
+
+  // Placeholder SVG como data URI (se usa cuando no hay foto)
+  const PLACEHOLDER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="%23EEF4FF"/><text x="50%" y="45%" font-family="sans-serif" font-size="32" text-anchor="middle" fill="%23003082" opacity="0.3">📦</text><text x="50%" y="68%" font-family="sans-serif" font-size="12" text-anchor="middle" fill="%2364748B">Sin foto registrada aún</text></svg>')}`;
 
   // Estado del ciclo de transparencia
   const hasDelivery = deliveryPhotos.length > 0;
@@ -469,9 +526,10 @@ function PurchaseCard({
       <div className="relative h-48 w-full bg-navy/5 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={coverPhoto}
+          src={coverPhoto ?? PLACEHOLDER_SVG}
           alt={purchase.item_description}
           className="w-full h-full object-cover"
+          onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_SVG; }}
         />
         {/* Badge de Estado */}
         <span

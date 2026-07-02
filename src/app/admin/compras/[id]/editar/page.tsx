@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import EditarCompraClient from "./EditarCompraClient";
+import { getConfirmedDonations, getLinkedDonations } from "@/app/actions/purchases";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -20,5 +21,17 @@ export default async function EditarCompraPage({ params }: Props) {
 
   if (!purchase) notFound();
 
-  return <EditarCompraClient purchase={purchase} />;
+  // Cargar donaciones confirmadas y vinculaciones existentes en paralelo
+  const [allDonations, linkedIds] = await Promise.all([
+    getConfirmedDonations(),
+    getLinkedDonations(id),
+  ]);
+
+  return (
+    <EditarCompraClient
+      purchase={purchase}
+      allDonations={allDonations}
+      initialLinkedIds={linkedIds}
+    />
+  );
 }
