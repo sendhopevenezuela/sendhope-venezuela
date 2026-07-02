@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ── Datos del equipo estáticos (Fallback en caso de que la BDD esté vacía) ────
 const FALLBACK_TEAM_MEMBERS = [
@@ -75,7 +75,7 @@ export async function TeamSection() {
 
   let members: DbTeamMember[] = [];
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data } = await supabase
       .from("team_members")
       .select("id, name, role, bio, initials, is_active, order_index")
