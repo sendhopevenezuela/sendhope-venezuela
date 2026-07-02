@@ -25,6 +25,7 @@ export default async function AdminDashboardPage() {
     { data: purchStats },
     { data: recentActivity },
     { data: pendingDonations },
+    { count: galleryPhotosCount },
   ] = await Promise.all([
     supabase
       .from("donations")
@@ -43,7 +44,12 @@ export default async function AdminDashboardPage() {
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(5),
+    supabase
+      .from("gallery_photos")
+      .select("*", { count: "exact", head: true }),
   ]);
+
+  const photosTotal = galleryPhotosCount ?? 0;
 
   const confirmed = (donStats ?? []).filter((d) => d.status === "confirmed");
   const totalRaisedUSD = confirmed
@@ -82,6 +88,8 @@ export default async function AdminDashboardPage() {
     updated_team_member: "✏️",
     deleted_team_member: "🗑",
     deleted_admin_user: "🔒",
+    created_gallery_photo: "📷",
+    deleted_gallery_photo: "🗑",
   };
 
   return (
@@ -95,11 +103,12 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* KPI grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard label="Recaudado (USD)" value={`$${totalRaisedUSD.toLocaleString("es-VE", { minimumFractionDigits: 2 })}`} sub={`${donorCount} donaciones confirmadas`} accent />
         <StatCard label="Pendientes de confirmar" value={pendingCount} sub={pendingCount > 0 ? "Revisa la bandeja" : "Todo al día ✓"} />
         <StatCard label="Total compras" value={purchasesTotal} sub={`${deliveredCount} entregadas`} />
         <StatCard label="Gasto total (USD)" value={`$${totalSpentUSD.toLocaleString("es-VE", { minimumFractionDigits: 2 })}`} />
+        <StatCard label="Fotos en galería" value={photosTotal} sub="Publicadas en web" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -163,11 +172,12 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {[
           { href: "/admin/compras/nueva", label: "Nueva Compra", icon: "🛒" },
           { href: "/admin/donaciones/nueva", label: "Registrar Donación", icon: "💸" },
           { href: "/admin/pagos", label: "Editar Datos de Pago", icon: "💳" },
+          { href: "/admin/galeria", label: "Gestionar Galería", icon: "📷" },
           { href: "/admin/muro-preview", label: "Ver Muro Público", icon: "👁" },
         ].map((link) => (
           <a

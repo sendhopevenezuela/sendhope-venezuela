@@ -28,9 +28,15 @@
     "purchase_label": "Compra verificada",
     "delivery_label": "Entregado a"
   },
+  "gallery_preview": {
+    "title": "Nuestra labor en imágenes",
+    "subtitle": "Fotos y momentos capturados en campo por nuestro equipo de voluntarios.",
+    "cta": "Ver galería completa",
+    "empty": "No hay fotos publicadas en este momento."
+  },
   "trust": {
     "title": "¿Por qué confiar en SendHope?",
-    "body": "Cada transacción en SendHope termina con tres cosas: una foto de la compra, un recibo escaneado y una foto de la entrega en el refugio. No publicamos hasta tener los tres. El sello verde que ves en cada registro no es decorativo — es la promesa de que ese ciclo se cerró por completo.",
+    "body": "Cada transacción en SendHope termina con tres cosas: una foto de la compra, un recibo escaneado y una foto de la entrega en el refugio. El sello verde que ves en cada registro no es decorativo — es la promesa de que ese ciclo se cerró por completo.",
     "seal_label": "Recibo Verificado",
     "seal_sublabel": "Compra documentada y entregada",
     "pillar_receipt": "Recibo",

@@ -318,14 +318,25 @@ export async function getConfirmedDonations(): Promise<{
   reference_note: string | null;
   tracking_code: string | null;
   created_at: string;
+  purchase_donations: {
+    purchase_id: string;
+    amount_allocated: number;
+  }[];
 }[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("donations")
-    .select("id, donor_name, amount, currency, reference_note, tracking_code, created_at")
+    .select(`
+      id, donor_name, amount, currency, reference_note, tracking_code, created_at,
+      purchase_donations (
+        purchase_id,
+        amount_allocated
+      )
+    `)
     .eq("status", "confirmed")
     .order("created_at", { ascending: false });
-  return data ?? [];
+
+  return (data ?? []) as any;
 }
 
 /** Devuelve los IDs de donaciones actualmente vinculadas a una compra */
@@ -338,7 +349,7 @@ export async function getLinkedDonations(purchaseId: string): Promise<string[]> 
   return (data ?? []).map((r) => r.donation_id);
 }
 
-/** Reemplaza las vinculaciones de donaciones para una compra */
+/** Reemplaza las vinculaciones de donaciones para una compra calculando asignaciones parciales */
 export async function setLinkedDonations(
   purchaseId: string,
   donationIds: string[],
@@ -346,24 +357,78 @@ export async function setLinkedDonations(
   const supabase = createAdminClient();
   const adminName = await getAdminName();
 
-  // Borrar vinculaciones existentes
+  // 1. Obtener la compra para saber su costo en USD
+  const { data: purchaseData, error: purchaseError } = await supabase
+    .from("purchases")
+    .select("amount")
+    .eq("id", purchaseId)
+    .single();
+
+  if (purchaseError || !purchaseData) {
+    return { error: `No se encontró la compra: ${purchaseError?.message ?? "Error"}` };
+  }
+
+  const purchaseCost = Number(purchaseData.amount);
+
+  // Limpiar vinculaciones existentes para esta compra
   const { error: deleteError } = await supabase
     .from("purchase_donations")
     .delete()
     .eq("purchase_id", purchaseId);
 
-  if (deleteError) return { error: `Error al actualizar vinculaciones: ${deleteError.message}` };
+  if (deleteError) return { error: `Error al limpiar vinculaciones: ${deleteError.message}` };
 
-  // Insertar nuevas vinculaciones
   if (donationIds.length > 0) {
-    const rows = donationIds.map((donation_id) => ({
-      purchase_id: purchaseId,
-      donation_id,
-      linked_by: adminName,
-    }));
+    // 2. Obtener los detalles de las donaciones seleccionadas junto con sus vinculaciones
+    const { data: selectedDonations, error: donationsError } = await supabase
+      .from("donations")
+      .select(`
+        id,
+        amount,
+        purchase_donations (
+          purchase_id,
+          amount_allocated
+        )
+      `)
+      .in("id", donationIds);
+
+    if (donationsError || !selectedDonations) {
+      return { error: `Error al obtener detalles de donaciones: ${donationsError?.message ?? "Error"}` };
+    }
+
+    // Ordenar de acuerdo al orden original de los IDs recibidos
+    const sortedDonations = [...selectedDonations].sort(
+      (a, b) => donationIds.indexOf(a.id) - donationIds.indexOf(b.id)
+    );
+
+    let remainingNeeded = purchaseCost;
+    const rowsToInsert = [];
+
+    for (const donation of sortedDonations) {
+      const allocations = donation.purchase_donations ?? [];
+      // Sumar lo asignado a OTRAS compras
+      const allocatedToOthers = allocations
+        .filter((alloc: any) => alloc.purchase_id !== purchaseId)
+        .reduce((sum: number, alloc: any) => sum + Number(alloc.amount_allocated), 0);
+
+      const available = Math.max(0, Number(donation.amount) - allocatedToOthers);
+      const allocatedHere = Math.min(available, remainingNeeded);
+
+      rowsToInsert.push({
+        purchase_id: purchaseId,
+        donation_id: donation.id,
+        amount_allocated: Number(allocatedHere.toFixed(2)),
+        linked_by: adminName,
+      });
+
+      remainingNeeded -= allocatedHere;
+    }
+
+    // Insertar nuevas relaciones con montos asignados
     const { error: insertError } = await supabase
       .from("purchase_donations")
-      .insert(rows);
+      .insert(rowsToInsert);
+
     if (insertError) return { error: `Error al vincular donaciones: ${insertError.message}` };
   }
 

@@ -28,9 +28,15 @@
     "purchase_label": "Verified purchase",
     "delivery_label": "Delivered to"
   },
+  "gallery_preview": {
+    "title": "Our Work in Images",
+    "subtitle": "Photos and moments captured in the field by our volunteer team.",
+    "cta": "View full gallery",
+    "empty": "No photos published at this time."
+  },
   "trust": {
     "title": "Why trust SendHope?",
-    "body": "Every SendHope transaction ends with three things: a photo of the purchase, a scanned receipt, and a photo of the delivery at the shelter. We don't publish until we have all three. The green seal you see on each entry isn't decorative — it means that cycle was fully completed.",
+    "body": "Every SendHope transaction ends with three things: a photo of the purchase, a scanned receipt, and a photo of the delivery at the shelter. The green seal you see on each entry isn't decorative — it means that cycle was fully completed.",
     "seal_label": "Verified Receipt",
     "seal_sublabel": "Purchase documented and delivered",
     "pillar_receipt": "Receipt",

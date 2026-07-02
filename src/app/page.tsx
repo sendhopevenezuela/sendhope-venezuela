@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/HeroSection";
 import { QuickPaySection } from "@/components/QuickPaySection";
 import { HowItWorksSection } from "@/components/HowItWorksSection";
 import { TransparencyPreview } from "@/components/TransparencyPreview";
+import { GalleryPreview } from "@/components/GalleryPreview";
 import { TrustSection } from "@/components/TrustSection";
 import { AboutSection } from "@/components/AboutSection";
 import { TeamSection } from "@/components/TeamSection";
@@ -19,6 +20,7 @@ export default function HomePage() {
         <QuickPaySection />
         <HowItWorksSection />
         <TransparencyPreview />
+        <GalleryPreview />
         <TrustSection />
         <AboutSection />
         <TeamSection />

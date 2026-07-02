@@ -11,6 +11,10 @@ type Donation = {
   reference_note: string | null;
   tracking_code: string | null;
   created_at: string;
+  purchase_donations: {
+    purchase_id: string;
+    amount_allocated: number;
+  }[];
 };
 
 type Props = {
@@ -87,38 +91,80 @@ export function DonationLinker({ purchaseId, allDonations, initialLinkedIds }: P
         ) : (
           filtered.map((d) => {
             const isLinked = linkedIds.has(d.id);
+            const allocations = d.purchase_donations ?? [];
+            const allocatedToOthers = allocations
+              .filter((a) => a.purchase_id !== purchaseId)
+              .reduce((sum, a) => sum + Number(a.amount_allocated), 0);
+
+            const available = Math.max(0, Number(d.amount) - allocatedToOthers);
+            const isExhausted = available <= 0;
+            const disabled = isExhausted && !isLinked;
+
             return (
               <button
                 key={d.id}
                 type="button"
+                disabled={disabled}
                 onClick={() => toggleDonation(d.id)}
                 className={`w-full flex items-center gap-3 text-left px-3 py-2 rounded-lg transition-all duration-150 ${
                   isLinked
                     ? "bg-[#003082] text-white"
+                    : disabled
+                    ? "bg-gray-50 text-gray-400 opacity-60 cursor-not-allowed"
                     : "bg-white hover:bg-[#EEF4FF] text-[#0A1628]"
                 }`}
               >
-                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${isLinked ? "border-white bg-white" : "border-[#003082]/30"}`}>
+                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                  isLinked 
+                    ? "border-white bg-white" 
+                    : disabled
+                    ? "border-gray-200"
+                    : "border-[#003082]/30"
+                }`}>
                   {isLinked && <span className="text-[#003082] text-[10px] font-bold">✓</span>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {d.tracking_code && (
-                      <span className={`font-mono text-[10px] font-bold tracking-wider ${isLinked ? "text-[#F4C31D]" : "text-[#003082]"}`}>
-                        {d.tracking_code}
+                  <div className="flex items-center gap-2 flex-wrap justify-between">
+                    <div className="flex items-center gap-2">
+                      {d.tracking_code && (
+                        <span className={`font-mono text-[10px] font-bold tracking-wider ${
+                          isLinked ? "text-[#F4C31D]" : disabled ? "text-gray-400" : "text-[#003082]"
+                        }`}>
+                          {d.tracking_code}
+                        </span>
+                      )}
+                      <span className={`font-sans text-xs font-semibold truncate ${
+                        isLinked ? "text-white" : disabled ? "text-gray-400" : "text-[#0A1628]"
+                      }`}>
+                        {d.donor_name ?? "Anónimo"}
                       </span>
-                    )}
-                    <span className={`font-sans text-xs font-semibold truncate ${isLinked ? "text-white" : "text-[#0A1628]"}`}>
-                      {d.donor_name ?? "Anónimo"} — ${d.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} {d.currency}
+                    </div>
+
+                    <span className="font-mono text-[10px] font-semibold">
+                      {isLinked ? (
+                        <span>
+                          Vinculado (${d.amount.toFixed(2)} {d.currency})
+                        </span>
+                      ) : disabled ? (
+                        <span className="text-red-500 bg-red-50 px-1.5 py-0.5 rounded text-[9px]">Agotado</span>
+                      ) : (
+                        <span className="text-green-600 bg-green-50 px-1.5 py-0.5 rounded text-[9px]">
+                          Disponible: ${available.toFixed(2)} / ${d.amount.toFixed(2)}
+                        </span>
+                      )}
                     </span>
                   </div>
                   {d.reference_note && (
-                    <p className={`font-mono text-[9px] truncate mt-0.5 ${isLinked ? "text-white/60" : "text-[#64748B]"}`}>
+                    <p className={`font-mono text-[9px] truncate mt-0.5 ${
+                      isLinked ? "text-white/60" : "text-gray-400"
+                    }`}>
                       {d.reference_note}
                     </p>
                   )}
                 </div>
-                <span className={`font-mono text-[9px] flex-shrink-0 ${isLinked ? "text-white/50" : "text-[#64748B]"}`}>
+                <span className={`font-mono text-[9px] flex-shrink-0 ${
+                  isLinked ? "text-white/50" : "text-gray-400"
+                }`}>
                   {new Date(d.created_at).toLocaleDateString("es-VE")}
                 </span>
               </button>
@@ -138,7 +184,7 @@ export function DonationLinker({ purchaseId, allDonations, initialLinkedIds }: P
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="ml-auto flex items-center gap-2 bg-[#003082] hover:bg-[#0042A6] text-white font-sans font-medium text-xs px-4 py-2 rounded-lg transition-colors disabled:opacity-60"
+          className="ml-auto flex items-center gap-2 bg-[#003082] hover:bg-[#0042A6] text-white font-sans font-medium text-xs px-4 py-2 rounded-lg transition-colors disabled:opacity-60 cursor-pointer"
         >
           {isPending ? (
             <><span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Guardando...</>

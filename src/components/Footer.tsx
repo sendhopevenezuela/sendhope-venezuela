@@ -35,7 +35,16 @@ export async function Footer() {
           >
             {t("contact")}
           </Link>
+          <Link
+            href="/admin"
+            className="hover:text-gold transition-colors duration-200"
+          >
+            Admin
+          </Link>
         </nav>
+      </div>
+      <div className="max-w-5xl mx-auto border-t border-white/5 mt-6 pt-4 text-center text-[10px] font-mono">
+        <p>un proyecto hecho por <span className="text-[#a855f7] font-semibold">BreinakosLab</span></p>
       </div>
     </footer>
   );

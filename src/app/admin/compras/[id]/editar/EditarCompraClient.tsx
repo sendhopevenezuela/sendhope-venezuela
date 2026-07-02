@@ -30,6 +30,10 @@ type Donation = {
   reference_note: string | null;
   tracking_code: string | null;
   created_at: string;
+  purchase_donations: {
+    purchase_id: string;
+    amount_allocated: number;
+  }[];
 };
 
 export default function EditarCompraClient({
