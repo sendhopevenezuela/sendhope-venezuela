@@ -47,8 +47,17 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
   const [isPending, startTransition] = useTransition();
   const [searchError, setSearchError] = useState<string | null>(null);
   const [foundDonation, setFoundDonation] = useState<FoundDonation | null>(null);
-  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  
+  // Galería de Lightbox con soporte para múltiples imágenes
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number>(0);
+
   const [activeInvoice, setActiveInvoice] = useState<PurchaseItem | null>(null);
+
+  const openLightbox = (images: string[], index = 0) => {
+    setLightboxImages(images);
+    setLightboxIndex(index);
+  };
 
   // Filtrado de compras por categoría
   const filteredPurchases = initialPurchases.filter((p) => {
@@ -77,6 +86,11 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
     });
   }
 
+  // Fotos de producto del item activo en el modal de factura
+  const activeProductPhotos = activeInvoice
+    ? activeInvoice.purchase_photos.filter((ph) => ph.photo_type === "product").map((ph) => ph.photo_url)
+    : [];
+
   return (
     <>
       <main className="bg-cream min-h-screen">
@@ -103,7 +117,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
         </section>
 
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 flex flex-col gap-10">
-          {/* ── Buscador "Busca tu Aporte" (Idea 8) ───────────────────────── */}
+          {/* ── Buscador "Busca tu Aporte" ───────────────────────────────── */}
           <section className="bg-white border border-[#003082]/10 rounded-2xl p-6 md:p-8 shadow-sm max-w-3xl mx-auto w-full">
             <h2 className="font-sans font-bold text-lg text-navy mb-2 flex items-center gap-2">
               <span>🔍</span> Busca tu donación y hazle seguimiento
@@ -137,7 +151,6 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
               <p className="text-xs text-scarlet font-sans mt-3 font-semibold">⚠ {searchError}</p>
             )}
 
-            {/* Resultado de donación encontrada */}
             {foundDonation && (
               <div className="mt-6 bg-verified-light/40 border border-verified/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fadeIn">
                 <div>
@@ -161,7 +174,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             )}
           </section>
 
-          {/* ── Filtro de Categorías (Idea 4) ────────────────────────────── */}
+          {/* ── Filtro de Categorías ────────────────────────────────────── */}
           <div className="flex justify-center gap-1.5 md:gap-2 flex-wrap">
             {CATEGORIES.map((cat) => (
               <button
@@ -178,7 +191,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             ))}
           </div>
 
-          {/* ── Masonry Grid de Compras (Idea 1) ──────────────────────────── */}
+          {/* ── Masonry Grid de Compras ──────────────────────────────────── */}
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
             {filteredPurchases.length === 0 ? (
               <div className="text-center py-20 text-muted font-sans text-sm w-full col-span-full">
@@ -186,7 +199,6 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
               </div>
             ) : (
               filteredPurchases.map((purchase) => {
-                // Determinar si esta compra se destaca (Idea 8: ±3 días de la donación buscada)
                 const isHighlighted =
                   foundDonation &&
                   Math.abs(
@@ -200,7 +212,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                     purchase={purchase}
                     isHighlighted={!!isHighlighted}
                     onOpenInvoice={(p) => setActiveInvoice(p)}
-                    onZoomImg={(src) => setLightboxImg(src)}
+                    onOpenGallery={(imgs, idx) => openLightbox(imgs, idx)}
                   />
                 );
               })
@@ -209,9 +221,9 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
         </div>
       </main>
 
-      {/* ── Modal Detalle de Factura / Soporte (Reemplazo Flip-Card) ── */}
+      {/* ── Modal Detalle de Factura / Soporte ── */}
       {activeInvoice && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-navy/10 flex flex-col max-h-[90vh] animate-fadeIn">
             {/* Cabecera */}
             <div className="p-5 border-b border-[#003082]/10 flex items-center justify-between bg-navy-light text-navy">
@@ -251,7 +263,10 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                       />
                       <button
                         onClick={() => {
-                          setLightboxImg(activeInvoice.purchase_photos.find((ph) => ph.photo_type === "receipt")!.photo_url);
+                          const receiptPhotos = activeInvoice.purchase_photos
+                            .filter((ph) => ph.photo_type === "receipt")
+                            .map((ph) => ph.photo_url);
+                          openLightbox(receiptPhotos, 0);
                         }}
                         className="absolute bg-black/60 hover:bg-black/85 text-white rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors shadow-md flex items-center gap-1"
                       >
@@ -266,6 +281,31 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                   )}
                 </div>
               </div>
+
+              {/* Galería de productos en el modal (si hay fotos de producto) */}
+              {activeProductPhotos.length > 0 && (
+                <div>
+                  <span className="block font-sans font-semibold text-xs text-[#0A1628] mb-2">
+                    Fotos de los insumos / productos ({activeProductPhotos.length}):
+                  </span>
+                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
+                    {activeProductPhotos.map((url, index) => (
+                      <div
+                        key={url}
+                        onClick={() => openLightbox(activeProductPhotos, index)}
+                        className="relative w-20 h-20 rounded-lg overflow-hidden border border-[#003082]/10 flex-shrink-0 cursor-zoom-in hover:opacity-85 transition-opacity bg-navy/5"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt={`Producto ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Detalles de Auditoría */}
               <div className="bg-[#EEF4FF] border border-[#003082]/10 rounded-xl p-4 flex flex-col gap-2.5 text-xs font-sans">
@@ -312,22 +352,65 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
         </div>
       )}
 
-      {/* ── Lightbox de Facturas (Idea 1) ───────────────────────────────── */}
-      {lightboxImg && (
+      {/* ── Visualizador de Galería (Lightbox) ── */}
+      {lightboxImages.length > 0 && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
-          onClick={() => setLightboxImg(null)}
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 select-none cursor-zoom-out"
+          onClick={() => setLightboxImages([])}
         >
-          <div className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={lightboxImg}
-              alt="Documento ampliado"
-              className="max-w-full max-h-full object-contain rounded-lg border border-white/10"
-            />
+          <div
+            className="relative max-w-4xl max-h-[85vh] w-full h-full flex flex-col items-center justify-center gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Contenedor de la Imagen Principal */}
+            <div className="relative flex-1 flex items-center justify-center w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={lightboxImages[lightboxIndex]}
+                alt="Visualización ampliada"
+                className="max-w-full max-h-full object-contain rounded-lg border border-white/10 shadow-2xl"
+              />
+
+              {/* Controles de Navegación Izquierda/Derecha si hay múltiples fotos */}
+              {lightboxImages.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setLightboxIndex((idx) => (idx - 1 + lightboxImages.length) % lightboxImages.length)}
+                    className="absolute left-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl transition-all duration-150 border border-white/10 hover:scale-105 active:scale-95"
+                    aria-label="Anterior"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={() => setLightboxIndex((idx) => (idx + 1) % lightboxImages.length)}
+                    className="absolute right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl transition-all duration-150 border border-white/10 hover:scale-105 active:scale-95"
+                    aria-label="Siguiente"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Contador de fotos y pie de página */}
+            <div className="text-center text-white/80 font-sans text-xs flex flex-col gap-1">
+              {lightboxImages.length > 1 && (
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
+                  Foto {lightboxIndex + 1} de {lightboxImages.length}
+                </span>
+              )}
+              <button
+                onClick={() => setLightboxImages([])}
+                className="text-white/60 hover:text-white underline underline-offset-4 text-[11px] mt-1"
+              >
+                Cerrar visualizador
+              </button>
+            </div>
+
+            {/* Botón de cerrar flotante */}
             <button
-              onClick={() => setLightboxImg(null)}
-              className="absolute top-2 right-2 bg-black/60 hover:bg-black/90 text-white rounded-full p-2 text-sm transition-colors"
+              onClick={() => setLightboxImages([])}
+              className="absolute -top-10 right-0 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 text-sm transition-colors border border-white/10"
               aria-label="Cerrar"
             >
               ✕
@@ -345,22 +428,27 @@ function PurchaseCard({
   purchase,
   isHighlighted,
   onOpenInvoice,
-  onZoomImg,
+  onOpenGallery,
 }: {
   purchase: PurchaseItem;
   isHighlighted: boolean;
   onOpenInvoice: (p: PurchaseItem) => void;
-  onZoomImg: (src: string) => void;
+  onOpenGallery: (images: string[], index: number) => void;
 }) {
-  // Extraer las fotos
-  const purchasePhoto = purchase.purchase_photos.find((p) => p.photo_type === "product")?.photo_url;
-  const deliveryPhoto = purchase.purchase_photos.find((p) => p.photo_type === "delivery")?.photo_url;
+  // Extraer las fotos agrupadas
+  const productPhotos = purchase.purchase_photos
+    .filter((p) => p.photo_type === "product")
+    .map((p) => p.photo_url);
 
-  // Foto de portada (frente): prioridad entrega > compra > placeholder
-  const coverPhoto = deliveryPhoto ?? purchasePhoto ?? "/placeholder-help.jpg";
+  const deliveryPhotos = purchase.purchase_photos
+    .filter((p) => p.photo_type === "delivery")
+    .map((p) => p.photo_url);
+
+  // Foto de portada (frente): prioridad entrega > producto > placeholder
+  const coverPhoto = deliveryPhotos[0] ?? productPhotos[0] ?? "/placeholder-help.jpg";
 
   // Estado del ciclo de transparencia
-  const hasDelivery = !!deliveryPhoto;
+  const hasDelivery = deliveryPhotos.length > 0;
 
   return (
     <div
@@ -416,11 +504,11 @@ function PurchaseCard({
           </p>
         </div>
 
-        {/* Monto y Botones */}
-        <div className="flex items-end justify-between pt-3 border-t border-[#003082]/5">
+        {/* Monto y Botones de Galería */}
+        <div className="flex items-end justify-between pt-3 border-t border-[#003082]/5 gap-2 flex-wrap sm:flex-nowrap">
           <div>
             <span className="block font-mono text-[8px] text-[#64748B] uppercase">Costo Total</span>
-            <span className="font-mono font-800 text-[#0A1628] text-lg">
+            <span className="font-mono font-800 text-[#0A1628] text-lg leading-none">
               ${purchase.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
             </span>
             {purchase.original_amount && (
@@ -429,19 +517,32 @@ function PurchaseCard({
               </span>
             )}
           </div>
-          <div className="flex gap-2">
+          
+          {/* Botones de acción dinámicos */}
+          <div className="flex gap-1.5 flex-wrap flex-shrink-0">
             <button
               onClick={() => onOpenInvoice(purchase)}
-              className="bg-navy-light text-navy hover:bg-navy hover:text-white px-3 py-1.5 rounded-lg font-sans font-600 text-xs transition-all duration-200"
+              className="bg-navy-light text-navy hover:bg-navy hover:text-white px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200"
+              title="Ver soporte contable"
             >
-              Ver factura 🧾
+              Factura 🧾
             </button>
-            {hasDelivery && deliveryPhoto && (
+            {productPhotos.length > 0 && (
               <button
-                onClick={() => onZoomImg(deliveryPhoto)}
-                className="bg-verified-light text-verified-dark hover:bg-verified hover:text-white px-3 py-1.5 rounded-lg font-sans font-600 text-xs transition-all duration-200"
+                onClick={() => onOpenGallery(productPhotos, 0)}
+                className="bg-gold-light text-gold-dark hover:bg-gold hover:text-navy px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200"
+                title="Ver fotos de los productos"
               >
-                Ver entrega 📦
+                Insumos ({productPhotos.length}) 📦
+              </button>
+            )}
+            {hasDelivery && (
+              <button
+                onClick={() => onOpenGallery(deliveryPhotos, 0)}
+                className="bg-verified-light text-verified-dark hover:bg-verified hover:text-white px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200"
+                title="Ver fotos de la entrega"
+              >
+                Entrega ({deliveryPhotos.length}) 🚚
               </button>
             )}
           </div>
