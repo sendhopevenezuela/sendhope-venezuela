@@ -94,5 +94,22 @@ export async function createDonation(formData: FormData): Promise<DonateResult> 
     return { error: "No pudimos registrar tu donación. Intenta de nuevo." };
   }
 
+  // Enviar correos transaccionales de forma asíncrona (sin bloquear el response)
+  const finalDonorName = donorName?.trim() || null;
+  const finalReference = `[${paymentMethod.toUpperCase()}] ${referenceNote}`;
+
+  if (donorEmail) {
+    const { sendDonationReceivedEmail } = require("@/lib/resend");
+    sendDonationReceivedEmail(donorEmail.trim(), finalDonorName, trackingCode, amount, "USD").catch((err: any) => {
+      console.error("[donate] Error sending received email:", err);
+    });
+  }
+
+  // Notificar a los administradores
+  const { sendAdminNewDonationNotification } = require("@/lib/resend");
+  sendAdminNewDonationNotification(amount, "USD", finalDonorName, trackingCode, finalReference).catch((err: any) => {
+    console.error("[donate] Error sending admin notification email:", err);
+  });
+
   return { success: true, donationId: data.id, trackingCode };
 }

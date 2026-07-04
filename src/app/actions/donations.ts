@@ -121,17 +121,33 @@ export async function confirmDonation(id: string): Promise<ActionResult> {
   const supabase = createAdminClient();
   const adminName = await getAdminName();
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("donations")
     .update({
       status: "confirmed",
       confirmed_by: adminName,
       confirmed_at: new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("donor_email, donor_name, amount, currency, tracking_code")
+    .single();
 
-  if (error) {
-    return { error: `Error al confirmar: ${error.message}` };
+  if (error || !data) {
+    return { error: `Error al confirmar: ${error?.message ?? "No se encontró el registro"}` };
+  }
+
+  // Enviar correo de verificación asíncronamente si hay email registrado
+  if (data.donor_email) {
+    const { sendDonationVerifiedEmail } = require("@/lib/resend");
+    sendDonationVerifiedEmail(
+      data.donor_email.trim(),
+      data.donor_name,
+      data.tracking_code,
+      Number(data.amount),
+      data.currency || "USD"
+    ).catch((err: any) => {
+      console.error("[donations] Error sending confirmation email:", err);
+    });
   }
 
   await logActivity(

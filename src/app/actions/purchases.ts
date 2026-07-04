@@ -357,10 +357,10 @@ export async function setLinkedDonations(
   const supabase = createAdminClient();
   const adminName = await getAdminName();
 
-  // 1. Obtener la compra para saber su costo en USD
+  // 1. Obtener la compra para saber su costo en USD y sus metadatos
   const { data: purchaseData, error: purchaseError } = await supabase
     .from("purchases")
-    .select("amount")
+    .select("amount, item_description, shelter_name")
     .eq("id", purchaseId)
     .single();
 
@@ -379,12 +379,15 @@ export async function setLinkedDonations(
   if (deleteError) return { error: `Error al limpiar vinculaciones: ${deleteError.message}` };
 
   if (donationIds.length > 0) {
-    // 2. Obtener los detalles de las donaciones seleccionadas junto con sus vinculaciones
+    // 2. Obtener los detalles de las donaciones seleccionadas junto con sus vinculaciones y datos de contacto
     const { data: selectedDonations, error: donationsError } = await supabase
       .from("donations")
       .select(`
         id,
         amount,
+        donor_name,
+        donor_email,
+        tracking_code,
         purchase_donations (
           purchase_id,
           amount_allocated
@@ -430,6 +433,26 @@ export async function setLinkedDonations(
       .insert(rowsToInsert);
 
     if (insertError) return { error: `Error al vincular donaciones: ${insertError.message}` };
+
+    // Enviar correos de asignación a donaciones que recibieron saldo (y tienen email registrado)
+    const { sendDonationAllocatedEmail } = require("@/lib/resend");
+    for (const row of rowsToInsert) {
+      if (row.amount_allocated > 0) {
+        const don = sortedDonations.find((d) => d.id === row.donation_id);
+        if (don && don.donor_email) {
+          sendDonationAllocatedEmail(
+            don.donor_email.trim(),
+            don.donor_name,
+            don.tracking_code || "",
+            row.amount_allocated,
+            purchaseData.item_description,
+            purchaseData.shelter_name
+          ).catch((err: any) => {
+            console.error("[purchases] Error sending allocation email:", err);
+          });
+        }
+      }
+    }
   }
 
   await logActivity(
