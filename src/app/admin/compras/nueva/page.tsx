@@ -228,7 +228,7 @@ export default function NuevaCompraPage() {
           <div>
             <h2 className="font-sans font-semibold text-base text-[#0A1628]">Fotos</h2>
             <p className="font-sans text-xs text-[#64748B] mt-1">
-              Si no adjuntas foto de entrega, la compra aparecerá como &quot;Coordinando entrega&quot; en el Muro de Transparencia.
+              Si no adjuntas foto de entrega, la compra aparecerá sin indicador de entrega en el Muro de Transparencia hasta que subas la foto.
             </p>
           </div>
           <PhotoUploader type="receipt" label="Foto del recibo" />

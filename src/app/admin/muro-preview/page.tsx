@@ -65,10 +65,8 @@ export default async function MuroPreviewPage() {
                 )}
                 <div className="p-4 flex flex-col gap-2">
                   <div className="flex items-center gap-2">
-                    {hasDelivery ? (
+                    {hasDelivery && (
                       <span className="text-[11px] font-mono bg-[#D1FAE5] text-[#047857] px-2 py-0.5 rounded-full">✓ Entregado</span>
-                    ) : (
-                      <span className="text-[11px] font-mono bg-[#FEF3C7] text-[#92400E] px-2 py-0.5 rounded-full">⟳ Coordinando entrega</span>
                     )}
                     {purchase.category && (
                       <span className="text-[11px] font-mono bg-[#EEF4FF] text-[#003082] px-2 py-0.5 rounded-full">{purchase.category}</span>

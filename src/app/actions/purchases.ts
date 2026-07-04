@@ -299,7 +299,7 @@ export async function updatePurchaseDeliveryStatus(
     adminName,
     "updated_delivery_status",
     "purchase",
-    `Cambió estado de entrega a: ${status === "delivered" ? "Entregado" : "Coordinando"}`,
+    `Cambió estado de entrega a: ${status === "delivered" ? "Entregado" : "Pendiente"}`,
     purchaseId,
   );
 

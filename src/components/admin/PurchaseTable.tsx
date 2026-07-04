@@ -42,7 +42,7 @@ function DeliveryBadge({ photos }: { photos: { photo_type: string }[] }) {
   }
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono bg-[#FEF3C7] text-[#92400E]">
-      ⟳ Coordinando
+      ⟳ Pendiente
     </span>
   );
 }

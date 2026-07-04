@@ -67,7 +67,7 @@ export default async function ComprasPage() {
         {[
           { label: "Total compras", value: items.length },
           { label: "Entregadas", value: items.filter((p) => p.purchase_photos.some((ph) => ph.photo_type === "delivery")).length },
-          { label: "Coordinando", value: items.filter((p) => !p.purchase_photos.some((ph) => ph.photo_type === "delivery")).length },
+          { label: "Pendientes", value: items.filter((p) => !p.purchase_photos.some((ph) => ph.photo_type === "delivery")).length },
           { label: "Gasto total (USD)", value: `$${items.filter((p) => p.currency === "USD").reduce((s, p) => s + Number(p.amount), 0).toLocaleString("es-VE", { minimumFractionDigits: 2 })}` },
         ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl border border-[#003082]/10 px-4 py-3">

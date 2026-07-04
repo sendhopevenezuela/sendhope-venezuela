@@ -256,10 +256,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
               filteredPurchases.map((purchase) => {
                 const isHighlighted =
                   foundDonation &&
-                  Math.abs(
-                    new Date(purchase.purchase_date).getTime() -
-                      new Date(foundDonation.created_at).getTime()
-                  ) <= 3 * 24 * 60 * 60 * 1000;
+                  linkedPurchases.some((lp) => lp.id === purchase.id);
 
                 return (
                   <PurchaseCard
@@ -511,7 +508,7 @@ function PurchaseCard({
 
   return (
     <div
-      className={`break-inside-avoid relative w-full rounded-2xl bg-white border border-[#003082]/10 overflow-hidden flex flex-col transition-all duration-300 ${
+      className={`break-inside-avoid relative w-full rounded-2xl bg-white border border-[#003082]/10 flex flex-col transition-all duration-300 ${
         isHighlighted
           ? "ring-4 ring-gold ring-offset-2 scale-[1.02] shadow-[0_0_20px_rgba(244,195,29,0.4)]"
           : "hover:shadow-lg hover:-translate-y-0.5"
@@ -525,7 +522,7 @@ function PurchaseCard({
       )}
 
       {/* Portada */}
-      <div className="relative h-48 w-full bg-navy/5 overflow-hidden">
+      <div className="relative h-48 w-full bg-navy/5 rounded-t-2xl overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={coverPhoto ?? PLACEHOLDER_SVG}
@@ -534,15 +531,11 @@ function PurchaseCard({
           onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_SVG; }}
         />
         {/* Badge de Estado */}
-        <span
-          className={`absolute top-3 right-3 font-sans font-bold text-[10px] uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm ${
-            hasDelivery
-              ? "bg-verified text-white"
-              : "bg-gold text-navy-dark animate-pulse"
-          }`}
-        >
-          {hasDelivery ? t("card_status_delivered") : t("card_status_pending")}
-        </span>
+        {hasDelivery && (
+          <span className="absolute top-3 right-3 font-sans font-bold text-[10px] uppercase tracking-wide px-2.5 py-1 rounded-full shadow-sm bg-verified text-white">
+            {t("card_status_delivered")}
+          </span>
+        )}
       </div>
 
       {/* Información */}

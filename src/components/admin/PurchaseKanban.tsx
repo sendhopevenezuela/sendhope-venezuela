@@ -37,7 +37,7 @@ const COLUMNS: Column[] = [
   },
   {
     id: "coordinating",
-    title: "Coordinando entrega",
+    title: "Pendiente",
     color: "border-[#F4C31D]",
     bg: "bg-[#FFFBEB]",
     filter: (p) => {

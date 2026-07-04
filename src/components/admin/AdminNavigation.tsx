@@ -134,6 +134,12 @@ export function AdminNavigation({
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const isAuthPage = pathname === "/admin/login" || pathname === "/admin/register";
+
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
     return pathname.startsWith(href);

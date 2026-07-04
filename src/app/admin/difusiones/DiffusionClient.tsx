@@ -155,7 +155,7 @@ export function DiffusionClient() {
               SendHope Venezuela
             </span>
             <span className="font-mono text-[9px] tracking-wider text-white/50 block mt-0.5 uppercase">
-              Transparencia Extrema
+              Juntos podemos ayudar más
             </span>
           </div>
 

@@ -90,7 +90,7 @@ export const htmlTemplate = (content: string, previewText: string) => `
     <div class="container">
       <div class="header">
         <h1>SendHope Venezuela</h1>
-        <p>Transparencia Extrema</p>
+        <p>Juntos podemos ayudar más</p>
       </div>
       <div class="content">
         ${content}
