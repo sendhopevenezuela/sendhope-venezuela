@@ -29,7 +29,7 @@ export async function GalleryPreview() {
           <div className="max-w-xl">
             <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-gold uppercase tracking-[0.2em] font-bold mb-3 bg-[#F4C31D]/10 px-2.5 py-1 rounded-full">
               <Camera size={12} className="text-gold" />
-              Nuestra Labor
+              {t("tag")}
             </span>
             <h2 className="font-sans font-800 text-3xl md:text-4xl text-navy leading-tight">
               {t("title")}

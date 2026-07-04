@@ -19,18 +19,34 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SendHope Venezuela — Donaciones verificadas para refugios en Barquisimeto",
+  title: "SendHope Venezuela | Donaciones y Ayuda Humanitaria",
   description:
-    "Cada bolívar donado se convierte en una compra real con foto y recibo, entregada directamente a los refugios afectados por las inundaciones en Barquisimeto. Transparencia total.",
+    "Donaciones para Venezuela con transparencia en tiempo real. Apoya a damnificados de Caracas y La Guaira con comida y kits médicos desde Barquisimeto.",
+  keywords: [
+    "donaciones venezuela",
+    "ayuda humanitaria venezuela",
+    "damnificados caracas",
+    "damnificados la guaira",
+    "terremoto 24 de julio",
+    "transparencia en tiempo real",
+    "centro de acopio barquisimeto",
+    "kits medicos",
+    "donar comida venezuela",
+    "sendhope venezuela",
+    "ayuda de emergencia",
+    "refugios caracas",
+    "donar zelle venezuela",
+    "pago movil donaciones"
+  ],
   icons: {
     icon: "/icon.png",
     apple: "/apple-icon.png",
     shortcut: "/icon.png",
   },
   openGraph: {
-    title: "SendHope Venezuela — Ayuda Verificada al Terremoto del 24 de Julio",
+    title: "SendHope Venezuela | Donaciones y Ayuda Humanitaria",
     description:
-      "Donaciones verificadas para refugios en Barquisimeto, Caracas y La Guaira. Cada compra documentada con foto y recibo. Transparencia total.",
+      "Donaciones para Venezuela con transparencia en tiempo real. Apoya a damnificados de Caracas y La Guaira con comida y kits médicos desde Barquisimeto.",
     locale: "es_VE",
     type: "website",
     images: [
@@ -44,8 +60,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "SendHope Venezuela",
-    description: "Donaciones verificadas para refugios del terremoto del 24 de julio.",
+    title: "SendHope Venezuela | Donaciones y Ayuda Humanitaria",
+    description: "Donaciones para Venezuela con transparencia en tiempo real. Apoya a damnificados de Caracas y La Guaira.",
     images: ["/icon.png"],
   },
 };

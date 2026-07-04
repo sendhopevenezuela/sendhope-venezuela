@@ -44,7 +44,7 @@ export async function Footer() {
         </nav>
       </div>
       <div className="max-w-5xl mx-auto border-t border-white/5 mt-6 pt-4 text-center text-[10px] font-mono">
-        <p>un proyecto hecho por <span className="text-[#a855f7] font-semibold">BreinakosLab</span></p>
+        <p>{t("attribution")} <span className="text-[#a855f7] font-semibold">BreinakosLab</span></p>
       </div>
     </footer>
   );

@@ -73,7 +73,7 @@ export async function TransparencyPreview() {
 
         {displayItems.length === 0 ? (
           <div className="text-center py-16 text-muted font-sans text-sm border border-dashed border-[#003082]/15 bg-white/50 rounded-2xl mb-12">
-            No hay compras registradas en este momento. Las compras confirmadas aparecerán aquí.
+            {t("empty_preview")}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">

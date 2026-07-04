@@ -3,15 +3,19 @@ import { getGalleryPhotos } from "@/app/actions/gallery";
 import { GalleryClient } from "./GalleryClient";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Galería de Labor — SendHope Venezuela",
-  description:
-    "Fotos documentales de nuestro equipo en campo: entregas, coordinación logística y momentos de esperanza de los refugios apoyados en Barquisimeto.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("gallery");
+  return {
+    title: t("page_title"),
+    description: t("page_description"),
+  };
+}
 
 export default async function GaleriaPage() {
   const photos = await getGalleryPhotos();
+  const t = await getTranslations("gallery");
 
   return (
     <>
@@ -25,13 +29,13 @@ export default async function GaleriaPage() {
 
           <div className="relative z-10 max-w-2xl mx-auto">
             <span className="inline-block font-mono text-gold text-xs uppercase tracking-[0.2em] font-bold mb-3">
-              Nuestra Labor
+              {t("tag")}
             </span>
             <h1 className="font-sans font-800 text-3xl md:text-5xl text-white leading-tight mb-4">
-              Galería del Equipo
+              {t("title")}
             </h1>
             <p className="font-sans font-400 text-white/70 text-sm md:text-base leading-relaxed">
-              Momentos capturados por nuestro equipo en campo. Cada foto es evidencia de que el trabajo de ayuda humanitaria es real, humano y continuo.
+              {t("subtitle")}
             </p>
           </div>
         </section>
@@ -40,7 +44,9 @@ export default async function GaleriaPage() {
         {photos.length > 0 && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-2">
             <p className="font-mono text-xs text-muted uppercase tracking-wider">
-              {photos.length} {photos.length === 1 ? "fotografía" : "fotografías"} publicadas
+              {photos.length === 1
+                ? t("count_single", { count: photos.length })
+                : t("count_plural", { count: photos.length })}
             </p>
           </div>
         )}
@@ -53,13 +59,13 @@ export default async function GaleriaPage() {
         {/* CTA donar */}
         <section className="bg-navy py-12 px-6 text-center mt-8">
           <p className="font-sans font-700 text-white text-lg mb-4">
-            Cada foto representa una vida impactada. Tu donación hace esto posible.
+            {t("cta_text")}
           </p>
           <a
             href="/donar"
-            className="inline-block bg-gold hover:bg-gold-dark text-navy-dark font-sans font-700 px-8 py-3 rounded-full transition-all duration-200 active:scale-95"
+            className="inline-block bg-gold hover:bg-gold-dark text-navy-dark font-sans font-700 px-8 py-3 rounded-full transition-all duration-200 active:scale-95 cursor-pointer"
           >
-            Donar ahora
+            {t("cta_button")}
           </a>
         </section>
       </main>

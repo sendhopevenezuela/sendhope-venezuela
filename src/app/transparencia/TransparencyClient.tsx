@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { searchDonationByReference } from "@/app/actions/donations";
+import { useTranslations } from "next-intl";
 
 type PurchasePhoto = {
   id: string;
@@ -43,22 +44,14 @@ type LinkedPurchase = {
   currency: string;
 };
 
-const CATEGORIES = [
-  { id: "all", label: "Todos" },
-  { id: "alimentos", label: "Alimentos" },
-  { id: "agua", label: "Agua" },
-  { id: "medicinas", label: "Medicinas" },
-  { id: "aseo", label: "Aseo" },
-  { id: "otros", label: "Otros" },
-];
-
 export function TransparencyClient({ initialPurchases }: { initialPurchases: PurchaseItem[] }) {
+  const t = useTranslations("transparency");
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchRef, setSearchRef] = useState("");
   const [isPending, startTransition] = useTransition();
   const [searchError, setSearchError] = useState<string | null>(null);
   const [foundDonation, setFoundDonation] = useState<FoundDonation | null>(null);
-  
+
   // Galería de Lightbox con soporte para múltiples imágenes
   const [lightboxImages, setLightboxImages] = useState<string[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number>(0);
@@ -69,6 +62,16 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
     setLightboxImages(images);
     setLightboxIndex(index);
   };
+
+  // Categorías traducidas
+  const categoriesList = [
+    { id: "all", label: t("cat_all") },
+    { id: "alimentos", label: t("cat_alimentos") },
+    { id: "agua", label: t("cat_agua") },
+    { id: "medicinas", label: t("cat_medicinas") },
+    { id: "aseo", label: t("cat_aseo") },
+    { id: "otros", label: t("cat_otros") },
+  ];
 
   // Filtrado de compras por categoría
   const filteredPurchases = initialPurchases.filter((p) => {
@@ -84,14 +87,14 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
     setLinkedPurchases([]);
 
     if (searchRef.trim().length < 3) {
-      setSearchError("Ingresa al menos 3 caracteres.");
+      setSearchError(t("search_error_min"));
       return;
     }
 
     startTransition(async () => {
       const res = await searchDonationByReference(searchRef);
       if ("error" in res) {
-        setSearchError(res.error || "Error al buscar la donación");
+        setSearchError(res.error || t("search_error_generic"));
       } else if (res.donation) {
         setFoundDonation(res.donation);
         setLinkedPurchases(res.linkedPurchases ?? []);
@@ -122,10 +125,10 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             }}
           />
           <h1 className="relative font-sans font-800 text-white text-3xl md:text-5xl mb-4 tracking-tight">
-            Muro de Transparencia
+            {t("title")}
           </h1>
           <p className="relative font-sans font-400 text-white/70 max-w-2xl mx-auto text-sm md:text-lg leading-relaxed">
-            Aquí demostramos visual y públicamente el uso de cada donación. Cada compra física realizada en Barquisimeto cuenta con su factura auditada y foto de entrega en el refugio correspondiente.
+            {t("description")}
           </p>
         </section>
 
@@ -133,29 +136,29 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
           {/* ── Buscador "Busca tu Aporte" ───────────────────────────────── */}
           <section className="bg-white border border-[#003082]/10 rounded-2xl p-6 md:p-8 shadow-sm max-w-3xl mx-auto w-full">
             <h2 className="font-sans font-bold text-lg text-navy mb-2 flex items-center gap-2">
-              <span>🔍</span> Busca tu donación y hazle seguimiento
+              <span>🔍</span> {t("search_title")}
             </h2>
             <p className="font-sans text-xs md:text-sm text-muted mb-5">
-              Ingresa la referencia bancaria, últimos 4 dígitos o tu alias para verificar el destino y las compras asociadas a tu dinero en vivo.
+              {t("search_subtitle")}
             </p>
 
             <form onSubmit={handleSearch} className="flex gap-2 flex-wrap sm:flex-nowrap">
               <input
                 type="text"
-                placeholder="ej: Zelle de Carlos, Ref: 4521 o 982143..."
+                placeholder={t("search_placeholder")}
                 value={searchRef}
                 onChange={(e) => setSearchRef(e.target.value)}
-                className="flex-1 min-w-[200px] px-4 py-2.5 text-sm font-sans border border-[#003082]/20 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
+                className="flex-1 min-w-[200px] px-4 py-2.5 text-base md:text-sm font-sans border border-[#003082]/20 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
               />
               <button
                 type="submit"
                 disabled={isPending}
-                className="w-full sm:w-auto bg-navy hover:bg-navy-mid text-white px-6 py-2.5 rounded-xl font-sans font-600 text-sm transition-colors duration-150 flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full sm:w-auto bg-navy hover:bg-navy-mid text-white px-6 py-2.5 rounded-xl font-sans font-600 text-sm transition-colors duration-150 flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
               >
                 {isPending ? (
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  "Buscar"
+                  t("search_button")
                 )}
               </button>
             </form>
@@ -170,7 +173,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                 <div className="bg-verified-light/40 border border-verified/20 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <h3 className="font-sans font-bold text-sm text-verified-dark flex items-center gap-1.5">
-                      ¡Donación encontrada! 🎉
+                      {t("found_title")}
                       {foundDonation.tracking_code && (
                         <span className="font-mono text-[10px] bg-navy text-white px-2 py-0.5 rounded-full">
                           {foundDonation.tracking_code}
@@ -178,14 +181,11 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                       )}
                     </h3>
                     <p className="font-sans text-xs text-navy/80 mt-1 leading-relaxed">
-                      Aporte de{" "}
-                      <strong>{foundDonation.donor_name ?? "Donante Anónimo"}</strong>{" "}
-                      por{" "}
-                      <strong>
-                        ${foundDonation.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}{" "}
-                        {foundDonation.currency}
-                      </strong>{" "}
-                      — {new Date(foundDonation.created_at).toLocaleDateString("es-VE")}
+                      {t("found_detail", {
+                        donor: foundDonation.donor_name ?? "Anónimo",
+                        amount: `${foundDonation.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${foundDonation.currency}`,
+                        date: new Date(foundDonation.created_at).toLocaleDateString("es-VE"),
+                      })}
                     </p>
                   </div>
                 </div>
@@ -194,7 +194,9 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                 {linkedPurchases.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     <p className="font-sans text-xs font-semibold text-navy">
-                      🛒 Tu aporte financió {linkedPurchases.length === 1 ? "esta compra" : `estas ${linkedPurchases.length} compras`}:
+                      {linkedPurchases.length === 1
+                        ? t("found_finance_single")
+                        : t("found_finance_plural", { count: linkedPurchases.length })}
                     </p>
                     {linkedPurchases.map((p) => (
                       <div key={p.id} className="bg-white border border-[#003082]/10 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
@@ -215,26 +217,25 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                     <span className="text-xl flex-shrink-0">⏳</span>
                     <div>
                       <p className="font-sans font-semibold text-sm text-[#92400E]">
-                        Tu donación está por ser utilizada
+                        {t("allocated_pending_title")}
                       </p>
                       <p className="font-sans text-xs text-[#92400E]/80 mt-1 leading-relaxed">
-                        Hemos recibido tu aporte y está siendo asignado a la próxima compra de insumos para los refugios. Vuelve a buscar tu código en unos días para ver en qué se utilizó. ¡Gracias por tu confianza!
+                        {t("allocated_pending_body")}
                       </p>
                     </div>
                   </div>
                 )}
               </div>
             )}
-
           </section>
 
           {/* ── Filtro de Categorías ────────────────────────────────────── */}
           <div className="flex justify-center gap-1.5 md:gap-2 flex-wrap">
-            {CATEGORIES.map((cat) => (
+            {categoriesList.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-1.5 rounded-full font-sans text-xs md:text-sm font-semibold transition-all duration-200 ${
+                className={`px-4 py-1.5 rounded-full font-sans text-xs md:text-sm font-semibold transition-all duration-200 cursor-pointer ${
                   activeCategory === cat.id
                     ? "bg-navy text-white shadow-md scale-105"
                     : "bg-white border border-[#003082]/10 text-navy hover:bg-[#EEF4FF]"
@@ -249,7 +250,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
           <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
             {filteredPurchases.length === 0 ? (
               <div className="text-center py-20 text-muted font-sans text-sm w-full col-span-full">
-                No hay compras registradas en esta categoría.
+                {t("empty_category")}
               </div>
             ) : (
               filteredPurchases.map((purchase) => {
@@ -267,6 +268,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                     isHighlighted={!!isHighlighted}
                     onOpenInvoice={(p) => setActiveInvoice(p)}
                     onOpenGallery={(imgs, idx) => openLightbox(imgs, idx)}
+                    t={t}
                   />
                 );
               })
@@ -282,12 +284,12 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             {/* Cabecera */}
             <div className="p-5 border-b border-[#003082]/10 flex items-center justify-between bg-navy-light text-navy">
               <div>
-                <h3 className="font-sans font-bold text-base leading-snug">Soporte de Compra</h3>
+                <h3 className="font-sans font-bold text-base leading-snug">{t("modal_title")}</h3>
                 <p className="font-mono text-[10px] text-navy/70 mt-0.5">ID: #{activeInvoice.id.slice(0, 8).toUpperCase()}</p>
               </div>
               <button
                 onClick={() => setActiveInvoice(null)}
-                className="text-navy/55 hover:text-navy text-lg p-1 px-2.5 rounded-full hover:bg-navy/10 transition-colors font-sans"
+                className="text-navy/55 hover:text-navy text-lg p-1 px-2.5 rounded-full hover:bg-navy/10 transition-colors font-sans cursor-pointer"
                 aria-label="Cerrar modal"
               >
                 ✕
@@ -299,20 +301,20 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
               <div>
                 <h4 className="font-sans font-bold text-[#0A1628] text-sm mb-1">{activeInvoice.item_description}</h4>
                 <p className="font-sans text-xs text-[#64748B]">
-                  Entregado en: <strong className="text-navy">{activeInvoice.shelter_name}</strong> · {new Date(activeInvoice.purchase_date).toLocaleDateString("es-VE")}
+                  {t("delivery_label")}: <strong className="text-navy">{activeInvoice.shelter_name}</strong> · {new Date(activeInvoice.purchase_date).toLocaleDateString("es-VE")}
                 </p>
               </div>
 
               {/* Imagen de factura */}
               <div>
-                <span className="block font-sans font-semibold text-xs text-[#0A1628] mb-2">Comprobante / Recibo digitalizado:</span>
+                <span className="block font-sans font-semibold text-xs text-[#0A1628] mb-2">{t("modal_receipt_title")}</span>
                 <div className="relative bg-navy/5 border border-dashed border-[#003082]/20 rounded-xl overflow-hidden h-64 flex items-center justify-center">
                   {activeInvoice.purchase_photos.find((ph) => ph.photo_type === "receipt")?.photo_url ? (
                     <>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={activeInvoice.purchase_photos.find((ph) => ph.photo_type === "receipt")!.photo_url}
-                        alt="Factura digitalizada"
+                        alt={t("modal_title")}
                         className="w-full h-full object-contain"
                       />
                       <button
@@ -322,15 +324,15 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                             .map((ph) => ph.photo_url);
                           openLightbox(receiptPhotos, 0);
                         }}
-                        className="absolute bg-black/60 hover:bg-black/85 text-white rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors shadow-md flex items-center gap-1"
+                        className="absolute bg-black/60 hover:bg-black/85 text-white rounded-full px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors shadow-md flex items-center gap-1 cursor-pointer"
                       >
-                        🔍 Ampliar imagen
+                        {t("modal_receipt_zoom")}
                       </button>
                     </>
                   ) : (
                     <div className="text-center p-6 text-muted flex flex-col items-center gap-1.5">
                       <span className="text-3xl">🧾</span>
-                      <p className="text-xs">Comprobante de compra en proceso de digitalización.</p>
+                      <p className="text-xs">{t("modal_receipt_pending")}</p>
                     </div>
                   )}
                 </div>
@@ -340,7 +342,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
               {activeProductPhotos.length > 0 && (
                 <div>
                   <span className="block font-sans font-semibold text-xs text-[#0A1628] mb-2">
-                    Fotos de los insumos / productos ({activeProductPhotos.length}):
+                    {t("modal_products_title", { count: activeProductPhotos.length })}
                   </span>
                   <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
                     {activeProductPhotos.map((url, index) => (
@@ -364,7 +366,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
               {/* Detalles de Auditoría */}
               <div className="bg-[#EEF4FF] border border-[#003082]/10 rounded-xl p-4 flex flex-col gap-2.5 text-xs font-sans">
                 <div className="flex justify-between border-b border-[#003082]/5 pb-2">
-                  <span className="text-[#64748B]">Monto auditado (USD):</span>
+                  <span className="text-[#64748B]">{t("modal_audit_amount")}</span>
                   <span className="font-mono font-bold text-navy text-sm">
                     ${activeInvoice.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </span>
@@ -372,13 +374,13 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                 {activeInvoice.original_amount && (
                   <>
                     <div className="flex justify-between border-b border-[#003082]/5 pb-2">
-                      <span className="text-[#64748B]">Monto VES original:</span>
+                      <span className="text-[#64748B]">{t("modal_audit_original")}</span>
                       <span className="font-mono font-bold text-[#0A1628]">
                         Bs. {activeInvoice.original_amount.toLocaleString("es-VE", { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between border-b border-[#003082]/5 pb-2">
-                      <span className="text-[#64748B]">Tasa oficial de cambio:</span>
+                      <span className="text-[#64748B]">{t("modal_audit_rate")}</span>
                       <span className="font-mono text-[#0A1628]">
                         Bs. {activeInvoice.exchange_rate_used?.toLocaleString("es-VE", { minimumFractionDigits: 4 })}
                       </span>
@@ -387,7 +389,7 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                 )}
                 {activeInvoice.notes && (
                   <div className="text-[11px] text-[#64748B] italic leading-relaxed pt-1">
-                    <strong>Notas:</strong> {activeInvoice.notes}
+                    <strong>{t("modal_audit_notes")}</strong> {activeInvoice.notes}
                   </div>
                 )}
               </div>
@@ -397,9 +399,9 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
               <button
                 onClick={() => setActiveInvoice(null)}
-                className="bg-navy text-white hover:bg-navy-mid px-5 py-2.5 rounded-xl font-sans font-600 text-xs transition-colors"
+                className="bg-navy text-white hover:bg-navy-mid px-5 py-2.5 rounded-xl font-sans font-600 text-xs transition-colors cursor-pointer"
               >
-                Cerrar Soporte
+                {t("modal_close")}
               </button>
             </div>
           </div>
@@ -417,11 +419,11 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             onClick={(e) => e.stopPropagation()}
           >
             {/* Contenedor de la Imagen Principal */}
-            <div className="relative flex-1 flex items-center justify-center w-full">
+            <div className="relative flex-1 flex items-center justify-center w-full bg-black/50">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={lightboxImages[lightboxIndex]}
-                alt="Visualización ampliada"
+                alt={t("lightbox_alt")}
                 className="max-w-full max-h-full object-contain rounded-lg border border-white/10 shadow-2xl"
               />
 
@@ -430,14 +432,14 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
                 <>
                   <button
                     onClick={() => setLightboxIndex((idx) => (idx - 1 + lightboxImages.length) % lightboxImages.length)}
-                    className="absolute left-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl transition-all duration-150 border border-white/10 hover:scale-105 active:scale-95"
+                    className="absolute left-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl transition-all duration-150 border border-white/10 hover:scale-105 active:scale-95 cursor-pointer"
                     aria-label="Anterior"
                   >
                     ‹
                   </button>
                   <button
                     onClick={() => setLightboxIndex((idx) => (idx + 1) % lightboxImages.length)}
-                    className="absolute right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl transition-all duration-150 border border-white/10 hover:scale-105 active:scale-95"
+                    className="absolute right-2 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl transition-all duration-150 border border-white/10 hover:scale-105 active:scale-95 cursor-pointer"
                     aria-label="Siguiente"
                   >
                     ›
@@ -450,21 +452,21 @@ export function TransparencyClient({ initialPurchases }: { initialPurchases: Pur
             <div className="text-center text-white/80 font-sans text-xs flex flex-col gap-1">
               {lightboxImages.length > 1 && (
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
-                  Foto {lightboxIndex + 1} de {lightboxImages.length}
+                  {t("lightbox_counter", { current: lightboxIndex + 1, total: lightboxImages.length })}
                 </span>
               )}
               <button
                 onClick={() => setLightboxImages([])}
-                className="text-white/60 hover:text-white underline underline-offset-4 text-[11px] mt-1"
+                className="text-white/60 hover:text-white underline underline-offset-4 text-[11px] mt-1 cursor-pointer"
               >
-                Cerrar visualizador
+                {t("lightbox_close")}
               </button>
             </div>
 
             {/* Botón de cerrar flotante */}
             <button
               onClick={() => setLightboxImages([])}
-              className="absolute -top-10 right-0 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 text-sm transition-colors border border-white/10"
+              className="absolute -top-10 right-0 bg-black/50 hover:bg-black/80 text-white rounded-full p-2 text-sm transition-colors border border-white/10 cursor-pointer"
               aria-label="Cerrar"
             >
               ✕
@@ -483,13 +485,14 @@ function PurchaseCard({
   isHighlighted,
   onOpenInvoice,
   onOpenGallery,
+  t,
 }: {
   purchase: PurchaseItem;
   isHighlighted: boolean;
   onOpenInvoice: (p: PurchaseItem) => void;
   onOpenGallery: (images: string[], index: number) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
-  // Extraer las fotos agrupadas
   const productPhotos = purchase.purchase_photos
     .filter((p) => p.photo_type === "product")
     .map((p) => p.photo_url);
@@ -501,10 +504,9 @@ function PurchaseCard({
   // Foto de portada (frente): prioridad entrega > producto > null (placeholder SVG inline)
   const coverPhoto = deliveryPhotos[0] ?? productPhotos[0] ?? null;
 
-  // Placeholder SVG como data URI (se usa cuando no hay foto)
-  const PLACEHOLDER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="%23EEF4FF"/><text x="50%" y="45%" font-family="sans-serif" font-size="32" text-anchor="middle" fill="%23003082" opacity="0.3">📦</text><text x="50%" y="68%" font-family="sans-serif" font-size="12" text-anchor="middle" fill="%2364748B">Sin foto registrada aún</text></svg>')}`;
+  // Placeholder SVG como data URI
+  const PLACEHOLDER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="%23EEF4FF"/><text x="50%" y="45%" font-family="sans-serif" font-size="32" text-anchor="middle" fill="%23003082" opacity="0.3">📦</text><text x="50%" y="68%" font-family="sans-serif" font-size="12" text-anchor="middle" fill="%2364748B">' + t("placeholder_no_photo") + '</text></svg>')}`;
 
-  // Estado del ciclo de transparencia
   const hasDelivery = deliveryPhotos.length > 0;
 
   return (
@@ -518,7 +520,7 @@ function PurchaseCard({
       {/* Badge de Trazabilidad Flotante si está destacada */}
       {isHighlighted && (
         <span className="absolute -top-3 left-4 z-20 bg-gold text-navy-dark font-sans font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-full shadow-md animate-bounce">
-          ✨ Financiado por tu aporte
+          {t("card_financed")}
         </span>
       )}
 
@@ -539,7 +541,7 @@ function PurchaseCard({
               : "bg-gold text-navy-dark animate-pulse"
           }`}
         >
-          {hasDelivery ? "✓ Entregado y Verificado" : "Coordinando entrega"}
+          {hasDelivery ? t("card_status_delivered") : t("card_status_pending")}
         </span>
       </div>
 
@@ -548,7 +550,7 @@ function PurchaseCard({
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
             <span className="font-mono text-[9px] text-[#64748B] uppercase font-bold tracking-wide">
-              {purchase.category ?? "Ayuda"}
+              {purchase.category ? t(`cat_${purchase.category.toLowerCase()}`) : t("cat_otros")}
             </span>
             <span className="font-mono text-[10px] text-[#64748B]">
               {new Date(purchase.purchase_date).toLocaleDateString("es-VE")}
@@ -558,49 +560,49 @@ function PurchaseCard({
             {purchase.item_description}
           </h3>
           <p className="font-sans text-xs text-[#64748B]">
-            Destinado a: <strong className="text-navy">{purchase.shelter_name}</strong>
+            {t("card_destined")} <strong className="text-navy">{purchase.shelter_name}</strong>
           </p>
         </div>
 
         {/* Monto y Botones de Galería */}
         <div className="flex items-end justify-between pt-3 border-t border-[#003082]/5 gap-2 flex-wrap sm:flex-nowrap">
           <div>
-            <span className="block font-mono text-[8px] text-[#64748B] uppercase">Costo Total</span>
+            <span className="block font-mono text-[8px] text-[#64748B] uppercase">{t("card_cost_total")}</span>
             <span className="font-mono font-800 text-[#0A1628] text-lg leading-none">
               ${purchase.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
             </span>
             {purchase.original_amount && (
               <span className="block font-mono text-[9px] text-[#64748B] mt-0.5">
-                Original: Bs. {purchase.original_amount.toLocaleString("es-VE")}
+                {t("card_cost_original")} Bs. {purchase.original_amount.toLocaleString("es-VE")}
               </span>
             )}
           </div>
-          
+
           {/* Botones de acción dinámicos */}
           <div className="flex gap-1.5 flex-wrap flex-shrink-0">
             <button
               onClick={() => onOpenInvoice(purchase)}
-              className="bg-navy-light text-navy hover:bg-navy hover:text-white px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200"
-              title="Ver soporte contable"
+              className="bg-navy-light text-navy hover:bg-navy hover:text-white px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200 cursor-pointer"
+              title={t("card_title_invoice")}
             >
-              Factura 🧾
+              {t("card_btn_invoice")}
             </button>
             {productPhotos.length > 0 && (
               <button
                 onClick={() => onOpenGallery(productPhotos, 0)}
-                className="bg-gold-light text-gold-dark hover:bg-gold hover:text-navy px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200"
-                title="Ver fotos de los productos"
+                className="bg-gold-light text-gold-dark hover:bg-gold hover:text-navy px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200 cursor-pointer"
+                title={t("card_title_products")}
               >
-                Insumos ({productPhotos.length}) 📦
+                {t("card_btn_products", { count: productPhotos.length })}
               </button>
             )}
             {hasDelivery && (
               <button
                 onClick={() => onOpenGallery(deliveryPhotos, 0)}
-                className="bg-verified-light text-verified-dark hover:bg-verified hover:text-white px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200"
-                title="Ver fotos de la entrega"
+                className="bg-verified-light text-verified-dark hover:bg-verified hover:text-white px-2.5 py-1.5 rounded-lg font-sans font-600 text-[11px] transition-all duration-200 cursor-pointer"
+                title={t("card_title_delivery")}
               >
-                Entrega ({deliveryPhotos.length}) 🚚
+                {t("card_btn_delivery", { count: deliveryPhotos.length })}
               </button>
             )}
           </div>

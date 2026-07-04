@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type GalleryPhoto = {
   id: string;
@@ -13,15 +14,16 @@ type GalleryPhoto = {
 const PLACEHOLDER_SVG = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="#EEF4FF"/><text x="50%" y="50%" font-family="sans-serif" font-size="40" text-anchor="middle" fill="#003082" opacity="0.3">📷</text></svg>')}`;
 
 export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
+  const t = useTranslations("gallery");
   const [lightbox, setLightbox] = useState<{ photos: GalleryPhoto[]; index: number } | null>(null);
 
   if (photos.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
         <span className="text-6xl">📷</span>
-        <p className="font-sans font-semibold text-navy text-lg">La galería está por comenzar</p>
+        <p className="font-sans font-semibold text-navy text-lg">{t("empty_title")}</p>
         <p className="font-sans text-muted text-sm max-w-sm">
-          Pronto nuestro equipo publicará fotos documentando nuestra labor de campo. ¡Vuelve pronto!
+          {t("empty_body")}
         </p>
       </div>
     );
@@ -41,6 +43,7 @@ export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
             key={photo.id}
             photo={photo}
             onClick={() => setLightbox({ photos, index: idx })}
+            t={t}
           />
         ))}
       </div>
@@ -48,19 +51,19 @@ export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
       {/* Lightbox */}
       {lightbox && current && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center p-4 cursor-zoom-out"
           onClick={() => setLightbox(null)}
         >
           <div
-            className="relative max-w-4xl w-full flex flex-col items-center gap-4"
+            className="relative max-w-4xl w-full flex flex-col items-center gap-4 animate-fadeIn"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Imagen */}
-            <div className="relative w-full max-h-[75vh] flex items-center justify-center">
+            <div className="relative w-full max-h-[75vh] flex items-center justify-center bg-black/50">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={current.photo_url}
-                alt={current.caption ?? "Foto de galería"}
+                alt={current.caption ?? t("lightbox_alt")}
                 className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10"
                 onError={(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER_SVG; }}
               />
@@ -70,14 +73,14 @@ export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
                 <>
                   <button
                     onClick={() => setLightbox(l => l ? { ...l, index: (l.index - 1 + l.photos.length) % l.photos.length } : null)}
-                    className="absolute left-3 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl border border-white/10 transition-all hover:scale-105"
+                    className="absolute left-3 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl border border-white/10 transition-all hover:scale-105 cursor-pointer"
                     aria-label="Anterior"
                   >
                     ‹
                   </button>
                   <button
                     onClick={() => setLightbox(l => l ? { ...l, index: (l.index + 1) % l.photos.length } : null)}
-                    className="absolute right-3 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl border border-white/10 transition-all hover:scale-105"
+                    className="absolute right-3 bg-black/60 hover:bg-black/90 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl border border-white/10 transition-all hover:scale-105 cursor-pointer"
                     aria-label="Siguiente"
                   >
                     ›
@@ -92,7 +95,7 @@ export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
                 {current.caption && (
                   <p className="font-sans font-semibold text-sm leading-snug">{current.caption}</p>
                 )}
-                <div className="flex items-center justify-center gap-3 mt-1">
+                <div className="flex items-center justify-center gap-3 mt-1 flex-wrap">
                   {current.location && (
                     <span className="font-sans text-white/60 text-xs flex items-center gap-1">📍 {current.location}</span>
                   )}
@@ -109,21 +112,21 @@ export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
             <div className="flex items-center gap-4">
               {lightbox.photos.length > 1 && (
                 <span className="font-mono text-white/40 text-[10px] uppercase tracking-widest">
-                  {lightbox.index + 1} / {lightbox.photos.length}
+                  {t("lightbox_counter", { current: lightbox.index + 1, total: lightbox.photos.length })}
                 </span>
               )}
               <button
                 onClick={() => setLightbox(null)}
-                className="text-white/60 hover:text-white text-xs underline underline-offset-4 transition-colors"
+                className="text-white/60 hover:text-white text-xs underline underline-offset-4 transition-colors cursor-pointer"
               >
-                Cerrar visualizador
+                {t("lightbox_close")}
               </button>
             </div>
 
             {/* Botón X flotante */}
             <button
               onClick={() => setLightbox(null)}
-              className="absolute -top-12 right-0 bg-black/50 hover:bg-black/80 text-white rounded-full p-2.5 border border-white/10 transition-colors"
+              className="absolute -top-12 right-0 bg-black/50 hover:bg-black/80 text-white rounded-full p-2.5 border border-white/10 transition-colors cursor-pointer"
               aria-label="Cerrar"
             >
               ✕
@@ -136,7 +139,15 @@ export function GalleryClient({ photos }: { photos: GalleryPhoto[] }) {
 }
 
 // ── Tarjeta Pinterest ─────────────────────────────────────────────────────────
-function PinterestCard({ photo, onClick }: { photo: GalleryPhoto; onClick: () => void }) {
+function PinterestCard({
+  photo,
+  onClick,
+  t,
+}: {
+  photo: GalleryPhoto;
+  onClick: () => void;
+  t: (key: string) => string;
+}) {
   const [loaded, setLoaded] = useState(false);
   const [errored, setErrored] = useState(false);
 
@@ -149,7 +160,7 @@ function PinterestCard({ photo, onClick }: { photo: GalleryPhoto; onClick: () =>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={errored ? PLACEHOLDER_SVG : photo.photo_url}
-        alt={photo.caption ?? "Foto de labor"}
+        alt={photo.caption ?? t("card_alt")}
         className={`w-full object-cover transition-all duration-500 ${loaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"} group-hover:scale-[1.03]`}
         onLoad={() => setLoaded(true)}
         onError={() => { setErrored(true); setLoaded(true); }}

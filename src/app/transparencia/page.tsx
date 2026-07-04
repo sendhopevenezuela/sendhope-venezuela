@@ -3,11 +3,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { TransparencyClient } from "./TransparencyClient";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Muro de Transparencia — SendHope Venezuela",
-  description: "Verifica cada bolívar y dólar donado. Acceso público a facturas, recibos y fotos de entregas en los refugios.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("transparency");
+  return {
+    title: `${t("title")} — SendHope Venezuela`,
+    description: t("description"),
+  };
+}
 
 export default async function TransparenciaPage() {
   const supabase = createAdminClient();

@@ -7,10 +7,10 @@ import { CheckCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("donar");
   return {
-    title: "Hacer una donación — SendHope Venezuela",
-    description:
-      "Elige un monto, realiza la transferencia y confirma tu referencia. Tu donación queda registrada y verificada.",
+    title: t("page_title"),
+    description: t("page_description"),
   };
 }
 
@@ -106,7 +106,7 @@ export default async function DonarPage() {
             <div className="flex items-center gap-2 mb-8 bg-verified-light border border-verified/20 rounded-xl px-4 py-3">
               <CheckCircle size={16} className="text-verified flex-shrink-0" />
               <p className="font-sans text-sm text-verified">
-                Tu donación queda registrada y se confirma manualmente por el equipo en menos de 24 h.
+                {t("trust_badge_alert")}
               </p>
             </div>
 

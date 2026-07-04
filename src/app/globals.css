@@ -56,3 +56,11 @@ body {
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+/* Previene el zoom automático de Safari iOS en los inputs al hacer focus */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+

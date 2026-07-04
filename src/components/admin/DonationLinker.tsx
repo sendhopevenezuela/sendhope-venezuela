@@ -30,6 +30,21 @@ export function DonationLinker({ purchaseId, allDonations, initialLinkedIds }: P
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
 
   const filtered = allDonations.filter((d) => {
+    const allocations = d.purchase_donations ?? [];
+    const allocatedToOthers = allocations
+      .filter((a) => a.purchase_id !== purchaseId)
+      .reduce((sum, a) => sum + Number(a.amount_allocated), 0);
+
+    const available = Math.max(0, Number(d.amount) - allocatedToOthers);
+    const isLinked = linkedIds.has(d.id);
+    const wasInitiallyLinked = initialLinkedIds.includes(d.id);
+
+    // Si la donación está consumida en su totalidad por otras compras
+    // y no está vinculada aquí (ni lo estuvo originalmente), la ocultamos
+    if (available <= 0 && !isLinked && !wasInitiallyLinked) {
+      return false;
+    }
+
     const q = search.toLowerCase();
     if (!q) return true;
     return (
